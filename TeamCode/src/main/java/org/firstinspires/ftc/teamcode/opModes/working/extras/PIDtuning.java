@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Disabled
 @Config
 @TeleOp
 public class PIDtuning extends OpMode {
@@ -19,9 +18,11 @@ public class PIDtuning extends OpMode {
     private PIDController LiftController;
     private PIDController ExtendController;
 
-    public static double Lp = 0.03, Li = 0, Ld = 0.0005;
+    public static double Lp =  0.015, //0.03,
+                         Li = 0,
+                         Ld = 0.0002;//0.0005;
     public static double Ep = .01, Ei = 0, Ed = .0004;
-    public static double Lf = 0.037;
+    public static double Lf = 0.04;
     public static double Ef = 0;
 
     public static int LiftTarget = 0;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.needsTested;
+package org.firstinspires.ftc.teamcode.opModes.working.main;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -17,12 +17,12 @@ public class TeleOpWithPID extends LinearOpMode {
     private PIDController LiftController;
     private PIDController ExtendController;
 
-    public static double Lp = 0.03, Li = 0, Ld = 0.0005;
+    public static double Lp = 0.015, Li = 0, Ld = 0.0002;
     public static double Ep = .01, Ei = 0, Ed = .0004;
-    public static double Lf = 0.037;
+    public static double Lf = 0.04;
     public static double Ef = 0;
 
-    public static int TargetLift = 700;
+    public static int TargetLift = 750;
     public static int TargetExtend = 0;
 
     private final double lift_ticks_in_degrees = 1.068055;
@@ -51,6 +51,7 @@ public class TeleOpWithPID extends LinearOpMode {
     private boolean LiftDown = true;                            // Is the Lift all the way down
 
     private ElapsedTime Transfer_Time = new ElapsedTime();      // Timer to keep track of the transfer time
+    private ElapsedTime Transfer_Delay = new ElapsedTime();
     private ElapsedTime ClawTime = new ElapsedTime();           // Timer to keep track since the claw was used last
 
     private ElapsedTime ClawDelay = new ElapsedTime();
@@ -60,6 +61,7 @@ public class TeleOpWithPID extends LinearOpMode {
     private double V4Bpos = 1;
     private double Flex = 0;
     private double Yaw = 0;
+    private boolean Transfered = false;
 
     private enum State {
         INTAKE,
@@ -133,16 +135,16 @@ public class TeleOpWithPID extends LinearOpMode {
         //****************************** SET MODE TO RUN_TO_POSITION ***************************************************
 
         //****************************** SET MOTORS TO BRAKE MODE *****************************************************
-        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);    // Sets the motor to be locked when stopped
-        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);   // Sets the motor to be locked when stopped
-        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);     // Sets the motor to be locked when stopped
-        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);    // Sets the motor to be locked when stopped
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
+        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to be locked when stopped
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);     // Sets the motor to be locked when stopped
+        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
 
-        LeftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);     // Sets the motor to be locked when stopped
-        RightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);    // Sets the motor to be locked when stopped
+        LeftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);     // Sets the motor to be locked when stopped
+        RightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
 
-        IntakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);   // Sets the motor to be locked when stopped
-        IntakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  // Sets the motor to be locked when stopped
+        IntakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to be locked when stopped
+        IntakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);  // Sets the motor to be locked when stopped
 
         //***************************** RESET SERVOS ***********************************************************
         IntakeClaw.setPosition(0);    // Closes Intake Claw
@@ -186,16 +188,18 @@ public class TeleOpWithPID extends LinearOpMode {
                     else if(gamepad2.b){
                         TargetExtend = 1;
                     }
-                    if (IntakeLeft.getCurrentPosition() <= 5 && IntakeClaw.getPosition() == .5){
+                    if (IntakeLeft.getCurrentPosition() <= 7 && IntakeClaw.getPosition() == .5){
                         Transfer_Time.reset();
+                        Transfer_Delay.reset();
+                        Transfered = false;
                         state = State.TRANSFER;
                     }
-                    if (gamepad2.right_bumper  && !IntakeClawClosed && ClawTime.seconds() >= .3){
+                    if (gamepad2.right_bumper && !IntakeClawClosed && ClawTime.seconds() >= .3){
                         ClawTime.reset();
                         IntakeClaw.setPosition(.5);
                         IntakeClawClosed = true;
                     }
-                    else if (gamepad2.right_bumper && IntakeClawClosed && ClawTime.seconds() >= .3){
+                    else if (gamepad2.right_bumper && IntakeClawClosed && ClawTime.seconds() >= 1){
                         ClawTime.reset();
                         IntakeClaw.setPosition(0);
                         IntakeClawClosed = false;
@@ -215,22 +219,26 @@ public class TeleOpWithPID extends LinearOpMode {
                     }
                     break;
                 case TRANSFER:
-                    if (Transfer_Time.seconds() >= .5) {
+                    if (Transfer_Time.seconds() >= .25) {
                         TargetLift = 480;
                     }
                     else {
                         TargetLift = 800;
                     }
-                    if(LeftLift.getCurrentPosition() < 484){
+                    if(LeftLift.getCurrentPosition() < 484 && Transfer_Delay.seconds() >= .6){
                         OuttakeClawClosed = true;
                         OuttakeClaw.setPosition(1);
-                        if(OuttakeClaw.getPosition() == 1){
+                        if(OuttakeClaw.getPosition() == 1 && Transfer_Delay.seconds() >= 1.1){
                             IntakeClawClosed = false;
                             IntakeClaw.setPosition(0);
                         }
                     }
                     if(IntakeClaw.getPosition() == 0){
-                        state = State.IDLE;
+                        V4Bpos = .75;
+                        if(Transfer_Delay.seconds() >= 1.5) {
+                            state = State.IDLE;
+                            Transfered = true;
+                        }
                     }
                     break;
 
@@ -259,10 +267,22 @@ public class TeleOpWithPID extends LinearOpMode {
                         IntakeClaw.setPosition(0);
                         IntakeClawClosed = false;
                     }
+                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){
+                        TargetLift = TargetLift + 10;
+                    }
+                    else if (gamepad2.left_trigger >= .75 && TargetLift > 10){
+                        TargetLift = TargetLift - 10;
+                    }
+                    if (gamepad2.a){
+                        TargetLift = 750;
+                        Transfered = false;
+                        state = State.INTAKE;
+                    }
                     break;
                 case OUTTAKE:
                     if (gamepad2.a){
                         TargetLift = 750;
+                        Transfered = false;
                         state = State.INTAKE;
                     }
                     if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3){
@@ -298,24 +318,24 @@ public class TeleOpWithPID extends LinearOpMode {
                     break;
             }
             if(gamepad1.dpad_up && gamepad2.dpad_up){
-                TargetLift = MAX_TARGET_LIFT;
+                TargetLift = MAX_TARGET_LIFT - 10;
                 state = State.CLIMB;
             }
-            if(LeftLift.getCurrentPosition() >= 800 && LeftLift.getCurrentPosition() <= MAX_TARGET_LIFT - 5){
+            if(Transfered){
                 OuttakeV4B.setPosition(0);
                 OuttakeWrist.setPosition(.7);
             }
             else {
                 OuttakeV4B.setPosition(1);
-                OuttakeWrist.setPosition(0);
+                OuttakeWrist.setPosition(.03);
             }
 
-            if(IntakeLeft.getCurrentPosition() <= 50){
+            if(IntakeLeft.getCurrentPosition() <= 50 && Transfer_Delay.seconds() >= 2){
                 Flex = 0;
                 V4Bpos = 1;
 
             }
-            else{
+            else if(Transfer_Delay.seconds() >= 2){
                 if (gamepad1.left_trigger > 0){
                     V4Bpos = 0.5*(1-(gamepad1.left_trigger)); //Control for variable virtual four bar height when in INTAKE state
                 }
@@ -364,10 +384,9 @@ public class TeleOpWithPID extends LinearOpMode {
             double Lpid = LiftController.calculate(LiftPos, TargetLift);
             double Epid = ExtendController.calculate(ExtendPos, TargetExtend);
             double LiftFF = Math.cos(Math.toRadians(TargetLift / lift_ticks_in_degrees)) * Lf;
-            double ExtendFF = Math.cos(Math.toRadians(TargetExtend / extend_ticks_in_degrees)) * Ef;
 
             double LiftPower = Lpid + LiftFF;
-            double ExtendPower = Epid + ExtendFF;
+            double ExtendPower = Epid;
 
             LeftLift.setPower(LiftPower);
             RightLift.setPower(LiftPower);
@@ -378,6 +397,7 @@ public class TeleOpWithPID extends LinearOpMode {
             telemetry.addData("Extend pos ", ExtendPos);
             telemetry.addData("lift target ", TargetLift);
             telemetry.addData("extend target ", TargetExtend);
+            telemetry.addData("state", state);
             telemetry.update();
 
         }
