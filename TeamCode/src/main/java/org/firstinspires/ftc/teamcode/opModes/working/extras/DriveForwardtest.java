@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.opModes.working.extras;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+@Disabled
 @Autonomous(name = "Drive Forward Test")
 public class DriveForwardtest extends LinearOpMode {
     public void runOpMode(){

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.opModes.working.extras;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Disabled
 @TeleOp(name = "Wrist And Claw Test No Extend")
 public class WristAndClawTest extends LinearOpMode {
 

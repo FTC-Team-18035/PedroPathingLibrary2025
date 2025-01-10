@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.broken;
+package org.firstinspires.ftc.teamcode.opModes.needsTested;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -11,25 +11,19 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp
-public class TeleOpWithPID extends LinearOpMode {
+@TeleOp(name = "Full Function TeleOP Only PID Extendo")
+public class TeleOpWithPIDnoPIDLift extends LinearOpMode {
 
-    private PIDController LiftController;
     private PIDController ExtendController;
 
-    public static double Lp = 0.03, Li = 0, Ld = 0.0005;
     public static double Ep = .01, Ei = 0, Ed = .0004;
-    public static double Lf = 0.037;
+
     public static double Ef = 0;
 
-    public static int TargetLift = 0;
     public static int TargetExtend = 0;
 
-    private final double lift_ticks_in_degrees = 1.068055;
     private final double extend_ticks_in_degrees = .403;
 
-    private DcMotorEx LeftLift;
-    private DcMotorEx RightLift;
     private DcMotorEx IntakeLeft;
     private DcMotorEx IntakeRight;
 
@@ -41,6 +35,8 @@ public class TeleOpWithPID extends LinearOpMode {
 
     private final int MAX_TARGET_LIFT = 2825;       // The max Lift Height
     private final int MAX_EXTENSION_LENGTH = 500;   // The max Extension Length
+
+    private int TargetLift = 700;                   // The Lift target position
 
     private double LiftPower = .9;                  // The Power set to the lift
     private double ExtensionPower = .5;            // The Power set to the extension
@@ -72,37 +68,21 @@ public class TeleOpWithPID extends LinearOpMode {
     State state = State.INTAKE;
 
     @Override
-    public void runOpMode(){
-        LiftController = new PIDController(Lp, Li, Ld);
+    public void runOpMode() {
         ExtendController = new PIDController(Ep, Ei, Ed);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        LeftLift = hardwareMap.get(DcMotorEx.class, "Left Lift");
-        RightLift = hardwareMap.get(DcMotorEx.class, "Right Lift");
-        IntakeLeft = hardwareMap.get(DcMotorEx.class, "Intake Left");
-        IntakeRight = hardwareMap.get(DcMotorEx.class, "Intake Right");
-
-
-        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        IntakeRight.setDirection(DcMotorSimple.Direction.REVERSE);   // Reverses the direction the motor turns
-
-        LeftLift.setDirection(DcMotorSimple.Direction.REVERSE);     // Reverses the direction the motor turns
-
 
         //*********************************** MOTORS ************************************************
         DcMotor FrontRight = hardwareMap.dcMotor.get("Front Right");   // Chub Port 0 // Gamepad 1
         DcMotor BackRight = hardwareMap.dcMotor.get("Back Right");     // Chub Port 1 // Left Stick For Moving
         DcMotor FrontLeft = hardwareMap.dcMotor.get("Front Left");     // Chub Port 2 // Right Stick For Turning
         DcMotor BackLeft = hardwareMap.dcMotor.get("Back Left");       // Chub Port 3
+
+
+        IntakeRight = hardwareMap.get(DcMotorEx.class, "Intake Right");; // Ehub Port 0 // X Button To Position Automatically? // Joystick Up And Down?
+        IntakeLeft = hardwareMap.get(DcMotorEx.class, "Intake Left");   // Ehub Port 1 // ----------------------------------
+        DcMotor RightLift = hardwareMap.dcMotor.get("Right Lift");     // Ehub Port 2 // Triangle Button To Delivery Position
+        DcMotor LeftLift = hardwareMap.dcMotor.get("Left Lift");       // Ehub Port 3 // ------------------------------------
 
         //*********************************** SERVOS ************************************************
         Servo IntakeClaw = hardwareMap.servo.get("Intake Claw");              // Chub Port 0 // O Button
@@ -125,12 +105,28 @@ public class TeleOpWithPID extends LinearOpMode {
         FrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         BackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        IntakeRight.setDirection(DcMotorSimple.Direction.REVERSE);   // Reverses the direction the motor turns
+
+        LeftLift.setDirection(DcMotorSimple.Direction.REVERSE);     // Reverses the direction the motor turns
+
         //****************************** RESET ENCODERS *******************************************************
+        RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);   // Resets the position so it sets it's current position to 0
+        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);    // Resets the position so it sets it's current position to 0
+
+        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); // Resets the position so it sets it's current position to 0
+        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  // Resets the position so it sets it's current position to 0
 
         //****************************** SET DEFAULT TARGET POSITION ***********************************************
+        LeftLift.setTargetPosition(0);     // Makes sure it starts at the set 0
+        RightLift.setTargetPosition(0);    // Makes sure it starts at the set 0
 
 
         //****************************** SET MODE TO RUN_TO_POSITION ***************************************************
+        LeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);  // Sets the mode so we can say to move the motor a certain amount of ticks
+        RightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION); // Sets the mode so we can say to move the motor a certain amount of ticks
+
+        IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);   // Sets the mode so we can say to move the motor a certain amount of ticks
+        IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);    // Sets the mode so we can say to move the motor a certain amount of ticks
 
         //****************************** SET MOTORS TO BRAKE MODE *****************************************************
         FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);    // Sets the motor to be locked when stopped
@@ -146,7 +142,6 @@ public class TeleOpWithPID extends LinearOpMode {
 
         //***************************** RESET SERVOS ***********************************************************
         IntakeClaw.setPosition(0);    // Closes Intake Claw
-
         OuttakeClaw.setPosition(0);   // Closes Outtake Claw
 
         LeftServo = Math.max(0, Math.min(1, Flex - (.5 * Yaw)));
@@ -167,7 +162,8 @@ public class TeleOpWithPID extends LinearOpMode {
 
 
         waitForStart();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
+
             //*************************** DRIVE CONTROLS **************************************************
             // check for driving input
             double y = -gamepad1.left_stick_y;         // Remember, this is reversed!
@@ -184,7 +180,7 @@ public class TeleOpWithPID extends LinearOpMode {
                         TargetExtend = 490;
                     }
                     else if(gamepad2.b){
-                        TargetExtend = 1;
+                        TargetExtend = 1;;
                     }
                     if (IntakeLeft.getCurrentPosition() <= 5 && IntakeClaw.getPosition() == .5){
                         Transfer_Time.reset();
@@ -356,32 +352,38 @@ public class TeleOpWithPID extends LinearOpMode {
             LeftIntakeWrist.setPosition(LeftServo); //Sets servos to calculated positions
             RightIntakeWrist.setPosition(RightServo); //^
 
-
-            LiftController.setPID(Lp, Li, Ld);
+            // Lift Power and movement
+            if (!(TargetLift > MAX_TARGET_LIFT)) {          // If the lift target height is < the max height
+                RightLift.setTargetPosition(TargetLift);    // Sets the right lift motor to turn until it's ticks = lift target
+                LeftLift.setTargetPosition(TargetLift);     // Sets the left lift motor to turn until it's ticks = lift target
+                RightLift.setPower(LiftPower);              // Sets the power to the Right lift motor
+                LeftLift.setPower(LiftPower);               // Sets the power to the left lift motor
+            }
+            // Intake power and movement
             ExtendController.setPID(Ep, Ei, Ed);
-            int LiftPos = LeftLift.getCurrentPosition();
             int ExtendPos = IntakeLeft.getCurrentPosition();
-            double Lpid = LiftController.calculate(LiftPos, TargetLift);
             double Epid = ExtendController.calculate(ExtendPos, TargetExtend);
-            double LiftFF = Math.cos(Math.toRadians(TargetLift / lift_ticks_in_degrees)) * Lf;
             double ExtendFF = Math.cos(Math.toRadians(TargetExtend / extend_ticks_in_degrees)) * Ef;
 
-            double LiftPower = Lpid + LiftFF;
             double ExtendPower = Epid + ExtendFF;
-
-            LeftLift.setPower(LiftPower);
-            RightLift.setPower(LiftPower);
             IntakeLeft.setPower(ExtendPower);
             IntakeRight.setPower(ExtendPower);
 
-            telemetry.addData("Lift pos ", LiftPos);
             telemetry.addData("Extend pos ", ExtendPos);
-            telemetry.addData("lift target ", TargetLift);
             telemetry.addData("extend target ", TargetExtend);
+
+           /* if (V4Bpos <= .3) {
+
+                if (gamepad1.touchpad_finger_1) {   // Allows manual yaw control if a finger is on the touchpad
+                    Yaw = gamepad1.touchpad_finger_1_x;     // Taking value from touchpad and saving as our desired yaw value
+                }
+                else{ Yaw = 0; }
+
+            }*/
+            telemetry.addData("state", state);
             telemetry.update();
 
         }
+
     }
-
-
 }

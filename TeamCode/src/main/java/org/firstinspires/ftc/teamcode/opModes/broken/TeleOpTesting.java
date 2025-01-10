@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // TODO - adjust static variables for new mecanum drive hardware
 // TODO - We have the values from the touchpad, still need to implement it into the wrist
 
+@Disabled
 @TeleOp(name = "TeleOp Skeleton")
 
 public class TeleOpTesting extends LinearOpMode {
