@@ -40,7 +40,7 @@ public class TeleOpWithPID extends LinearOpMode {
     private double denominator = 1;        // declare motor power calculation variable
 
     private final int MAX_TARGET_LIFT = 2825;       // The max Lift Height
-    private final int MAX_EXTENSION_LENGTH = 500;   // The max Extension Length
+    private final int MAX_EXTENSION_LENGTH = 415;   // The max Extension Length
 
     private double LiftPower = .9;                  // The Power set to the lift
     private double ExtensionPower = .5;            // The Power set to the extension
@@ -183,7 +183,7 @@ public class TeleOpWithPID extends LinearOpMode {
             switch(state) {
                 case INTAKE:
                     if (gamepad2.x){
-                        TargetExtend = 490;
+                        TargetExtend = MAX_EXTENSION_LENGTH;
                     }
                     else if(gamepad2.b){
                         TargetExtend = 1;

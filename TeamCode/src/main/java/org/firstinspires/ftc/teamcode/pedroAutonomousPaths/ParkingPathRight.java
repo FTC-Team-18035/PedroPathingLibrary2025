@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Right Parking Auto")
+@Autonomous(name = "Right Parking Auto", preselectTeleOp = "TeleOpWithPID")
 public class ParkingPathRight extends OpMode {
 
     private Follower follower;
@@ -40,9 +40,11 @@ public class ParkingPathRight extends OpMode {
     Servo OuttakeWrist;          // Ehub Port 1 // Preset To Go To Delivery Position With Triangle
     Servo OuttakeV4B;
 
-    private final Pose startPose = new Pose(10, 57, Math.toRadians(0));
+   // Old StartPos  private final Pose startPose = new Pose(10, 57, Math.toRadians(0));
 
-    private final Pose parkingPose = new Pose(13, 15, Math.toRadians(0));
+    private final Pose startPose = new Pose(8.6, 49, Math.toRadians(0));
+    // Old parkingPos private final Pose parkingPose = new Pose(13, 15, Math.toRadians(0));
+    private final Pose parkingPose = new Pose(12, 8, Math.toRadians(0));
 
     private Path parkPath;
 
@@ -72,6 +74,7 @@ public class ParkingPathRight extends OpMode {
         if(opModeTimer.getElapsedTimeSeconds() >= 5) {
             OuttakeV4B.setPosition(.5);
             IntakeV4B.setPosition(.8);
+            OuttakeWrist.setPosition(.25);
             if(opModeTimer.getElapsedTimeSeconds() >= 7) {
                 requestOpModeStop();
             }
