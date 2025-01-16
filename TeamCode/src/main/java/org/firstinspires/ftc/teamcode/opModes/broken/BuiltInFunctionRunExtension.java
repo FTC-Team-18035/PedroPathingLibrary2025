@@ -26,9 +26,6 @@ public class BuiltInFunctionRunExtension extends LinearOpMode {
     private final int MAX_EXTENSION_LENGTH = 415;
 
 
-
-
-
     @Override
     public void runOpMode() {
         IntakeLeft = hardwareMap.get(DcMotorEx.class, "Intake Left");
@@ -58,6 +55,7 @@ public class BuiltInFunctionRunExtension extends LinearOpMode {
             } else if (gamepad1.b) {
                 RunExtension(1, MAX_EXTENSION_LENGTH);
             }
+            updateExtension();
             telemetry.update();
         }
     }
@@ -66,6 +64,9 @@ public class BuiltInFunctionRunExtension extends LinearOpMode {
         if (target <= MaxExtendIntake) {
             TargetExtend = target;
         }
+    }
+    
+    public void updateExtension() {
         ExtendPos = IntakeLeft.getCurrentPosition();
         ExtendController.setPID(Ep, Ei, Ed);
         double Epid = ExtendController.calculate(ExtendPos, TargetExtend);

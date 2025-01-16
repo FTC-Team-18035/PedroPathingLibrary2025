@@ -57,6 +57,7 @@ public class BuiltInFunctionRunLift extends LinearOpMode {
             } else if (gamepad1.b) {
                 RunLift(1, MAX_TARGET_LIFT);
             }
+            updateLift();
             telemetry.update();
         }
     }
@@ -65,6 +66,9 @@ public class BuiltInFunctionRunLift extends LinearOpMode {
         if (target <= MaxTargetLift - 5) {
             TargetLift = target;
         }
+    }
+
+    public void updateLift() {
         LiftPos = LeftLift.getCurrentPosition();
         LiftController.setPID(Lp, Li, Ld);
         double Lpid = LiftController.calculate(LiftPos, TargetLift);
