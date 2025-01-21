@@ -14,21 +14,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Main TeleOp Swappable Target States")
 public class TeleOpSpecimenAndSamples extends LinearOpMode {
 
-    private PIDController LiftController;
+    private PIDController LiftController;                    // declare PID controller
     private PIDController ExtendController;
 
-    public static double Lp = 0.015, Li = 0, Ld = 0.0002;
+    public static double Lp = 0.015, Li = 0, Ld = 0.0002;    // PID control values for Lift and Extension
     public static double Ep = .01, Ei = 0, Ed = .0004;
     public static double Lf = 0.04;
     public static double Ef = 0;
 
-    public static int TargetLift = 750;
+    public static int TargetLift = 750;                      // Default values for Lift and Extension
     public static int TargetExtend = 0;
 
     private final double lift_ticks_in_degrees = 1.068055;
     private final double extend_ticks_in_degrees = .403;
 
-    private DcMotorEx LeftLift, RightLift, IntakeLeft, IntakeRight;
+    private DcMotorEx LeftLift, RightLift, IntakeLeft, IntakeRight;    // Motor and Servo Declarations
     private DcMotor FrontLeft, FrontRight, BackLeft, BackRight;
     private Servo RightIntakeWrist, LeftIntakeWrist, OuttakeV4B, OuttakeWrist, IntakeV4B, IntakeClaw, OuttakeClaw;
 
@@ -84,44 +84,28 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
 
     @Override
     public void runOpMode(){
-        LiftController = new PIDController(Lp, Li, Ld);
+        LiftController = new PIDController(Lp, Li, Ld);                // Create PID controllers and telemetry
         ExtendController = new PIDController(Ep, Ei, Ed);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        LeftLift = hardwareMap.get(DcMotorEx.class, "Left Lift");
-        RightLift = hardwareMap.get(DcMotorEx.class, "Right Lift");
-        IntakeLeft = hardwareMap.get(DcMotorEx.class, "Intake Left");
-        IntakeRight = hardwareMap.get(DcMotorEx.class, "Intake Right");
-
-
-        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        IntakeRight.setDirection(DcMotorSimple.Direction.REVERSE);   // Reverses the direction the motor turns
-
-        LeftLift.setDirection(DcMotorSimple.Direction.REVERSE);     // Reverses the direction the motor turns
-
-
-        //*********************************** MOTORS ************************************************
+        //*********************************** NAME MOTORS ************************************************
         FrontRight = hardwareMap.dcMotor.get("Front Right");   // Chub Port 0 // Gamepad 1
         BackRight = hardwareMap.dcMotor.get("Back Right");     // Chub Port 1 // Left Stick For Moving
         FrontLeft = hardwareMap.dcMotor.get("Front Left");     // Chub Port 2 // Right Stick For Turning
         BackLeft = hardwareMap.dcMotor.get("Back Left");       // Chub Port 3
 
-        //*********************************** SERVOS ************************************************
+        LeftLift = hardwareMap.get(DcMotorEx.class, "Left Lift");        // Name Lift and Extension motors
+        RightLift = hardwareMap.get(DcMotorEx.class, "Right Lift");
+        IntakeLeft = hardwareMap.get(DcMotorEx.class, "Intake Left");
+        IntakeRight = hardwareMap.get(DcMotorEx.class, "Intake Right");
+
+        //*********************************** NAME SERVOS ************************************************
         IntakeClaw = hardwareMap.servo.get("Intake Claw");              // Chub Port 0 // O Button
         RightIntakeWrist = hardwareMap.servo.get("Right Intake Wrist"); // Chub Port 1 // Increments Using Dpad Side Buttons?
         LeftIntakeWrist = hardwareMap.servo.get("Left Intake Wrist");   // Chub Port 2 // Ideally Stick Controlled
-        IntakeV4B = hardwareMap.servo.get("Intake V4B");     // Chub Port 3 // Preset To Swing Out With X
-        // Servo LeftIntakeV4B = hardwareMap.servo.get("Left Intake V4B");       // Chub Port 4 // --------------------------
-        //  Servo RightHook = hardwareMap.servo.get("Right Hook");                // Chub Port 5 // Linked To LeftHook Activated At The Same Time
+        IntakeV4B = hardwareMap.servo.get("Intake V4B");                 // Chub Port 3 // Preset To Swing Out With X
+        // Servo LeftIntakeV4B = hardwareMap.servo.get("Left Intake V4B");  // Chub Port 4 // --------------------------
+        //  Servo RightHook = hardwareMap.servo.get("Right Hook");          // Chub Port 5 // Linked To LeftHook Activated At The Same Time
 
         OuttakeClaw = hardwareMap.servo.get("Outtake Claw");            // Ehub Port 0 // If Slides Up O Activates This Claw
         OuttakeWrist = hardwareMap.servo.get("Outtake Wrist");          // Ehub Port 1 // Preset To Go To Delivery Position With Triangle
@@ -132,17 +116,28 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         RightServo = Flex + (.5 * Yaw);
 
         //****************************** REVERSE MOTORS *****************************************************
-
         FrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         BackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        IntakeRight.setDirection(DcMotorSimple.Direction.REVERSE);   // Reverses the direction the motor turns
+        LeftLift.setDirection(DcMotorSimple.Direction.REVERSE);     // Reverses the direction the motor turns
+        
+        //************************************** SET MODE **********************************************************
+        LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //****************************** RESET ENCODERS *******************************************************
+        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);        // Set Lift and Extension motor modes
+        RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //****************************** SET DEFAULT TARGET POSITION ***********************************************
 
 
-        //****************************** SET MODE TO RUN_TO_POSITION ***************************************************
 
+        
         //****************************** SET MOTORS TO BRAKE MODE *****************************************************
         FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
         FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to be locked when stopped
@@ -157,7 +152,6 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
 
         //***************************** RESET SERVOS ***********************************************************
         IntakeClaw.setPosition(0);    // Closes Intake Claw
-
         OuttakeClaw.setPosition(0);   // Closes Outtake Claw
 
         LeftServo = Math.max(0, Math.min(1, Flex - (.5 * Yaw)));
@@ -171,7 +165,7 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         OuttakeWrist.setPosition(0);    // Sets the outtake wrist to the starting position
 
         OuttakeV4B.setPosition(1);  // Sets the outtake virtual four bar to the starting position
-        //RightOuttakeV4B.setPosition(0); // Sets the outtake virtual four bar to the starting position
+        // RightOuttakeV4B.setPosition(0); // Sets the outtake virtual four bar to the starting position
 
         //   LeftHook.setPosition(0);    // Sets the left hook to the starting position
         //   RightHook.setPosition(0);   // Sets the right hook to the starting position
@@ -180,13 +174,13 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
 
-            double IntakePos = IntakeLeft.getCurrentPosition();
+            double IntakePos = IntakeLeft.getCurrentPosition();    // reads current position for intake and lift
             double LiftPos = LeftLift.getCurrentPosition();
 
-            DriveControls();
+            DriveControls();                           // calls method to control chassis
 
-            switch(currentTarget) {
-                case SAMPLES:
+            switch(currentTarget) {                    // State Machine to control Outtake claw control
+                case SAMPLES:                          // Ground acquisition of samples
                     Samples(IntakePos, LiftPos);
                     IntakeV4BCalc();
                     if(Transfered){
@@ -201,36 +195,36 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
                     if(IntakePos <= 50 && Transfer_Delay.seconds() >= 2){
                         Flex = 0;
                         V4Bpos = 1;
-
                     }
                     else if(Transfer_Delay.seconds() >= 2){
-                        if (gamepad1.left_trigger > 0){
+                        if (gamepad1.left_trigger > 0){              // TODO - this seems redundant as the forumla does all of this on it's own
                             V4Bpos = 0.5*(1-(gamepad1.left_trigger)); //Control for variable virtual four bar height when in INTAKE state
                         }
                         else {
-                            V4Bpos = .5;}
+                            V4Bpos = .5;
+                        }
+                        //  V4Bpos = 0.5*(1-(gamepad1.left_trigger));  //Control for variable virtual four bar height when in INTAKE state
                         Flex = .63;
                     }
                     break;
 
-                case SPECIMENS:
+                case SPECIMENS:                            // Wall acquistion of specimens with outtake claw
                     Specimens();
                     break;
             }
 
-            if(gamepad1.dpad_left && gamepad1.dpad_right && ChangeTargetStateTime.seconds() > 5) {
+            if(gamepad1.dpad_left && gamepad1.dpad_right && ChangeTargetStateTime.seconds() > 5) {  // selection of target state
                 ChangeTargetStateTime.reset();
                 ChangeTargets();
             }
 
-            if(gamepad1.dpad_up && gamepad2.dpad_up){
+            if(gamepad1.dpad_up && gamepad2.dpad_up){    // intiates CLIMB state by dual driver input
                 TargetLift = MAX_TARGET_LIFT - 10;
                 currentTarget = CurrentTarget.SAMPLES;
                 sampleState = SampleState.CLIMB;
             }
 
-
-            if(sampleState != SampleState.TRANSFER) {
+            if(sampleState != SampleState.TRANSFER) {        // allows manual lift adjustment if not in TRANSFER state
                 if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){
                     TargetLift = TargetLift + 10;
                 }
@@ -239,27 +233,25 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
                 }
             }
 
-            PIDcalc(IntakePos, LiftPos);
+            PIDcalc(IntakePos, LiftPos);        // call PID calculation method for lift and extension control
 
-            RunTelemetry(IntakePos, LiftPos);
+            RunTelemetry(IntakePos, LiftPos);    // calls telemetry method to write to driver hub
         }
-    }
-
+    }        // ************************** END of Loop ***************************************************
+// *************************************** METHODS called from Loop **************************************
     public void Samples(double intakePos, double liftPos) {
         switch(sampleState) {
             case SWAP:
                 IntakeClaw.setPosition(0);
-
                 OuttakeClaw.setPosition(0);
-
                 LeftIntakeWrist.setPosition(LeftServo);
                 IntakeV4B.setPosition(.8);
                 OuttakeWrist.setPosition(0);
                 OuttakeV4B.setPosition(1);
-
                 TargetExtend = 0;
                 TargetLift = 750;
                 sampleState = SampleState.INTAKE;
+                break;
 
             case INTAKE:
                 if (gamepad2.x){
@@ -451,32 +443,30 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
             y = gamepad1.left_stick_y;           // Remember, this is reversed!
             x = -gamepad1.left_stick_x * 1.1;    // Counteract imperfect strafing
             rx = gamepad1.right_stick_x;          // Measures turning
-
-            denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);    // calculate motor movement math and adjust according to lift height or manual precision mode selection
-
-            // check for Turbo or Precision Mode
-            if (gamepad1.left_bumper) {         // Left bumper is being pressed
-                precision = 1;                  // set speed to full power - TURBO MODE
-            } else if (gamepad1.right_bumper) { // Right bumper is being pressed
-                precision = 4;                  // set speed to 1/4 power - PRECISION MODE
-            } else {
-                precision = 2;                  // reset default speed to half power
-            }
-
-            // calculate motor power
-            denominator = denominator * precision;          // this adjusts motor speed to the desired precision level
-            frontLeftPower = (y + x + rx) / denominator;    // Does math to convert stick movement to motor powers
-            backLeftPower = (y - x + rx) / denominator;     // Does math to convert stick movement to motor powers
-            frontRightPower = (y - x - rx) / denominator;   // Does math to convert stick movement to motor powers
-            backRightPower = (y + x - rx) / denominator;    // Does math to convert stick movement to motor powers
-
-            // issue Drive Wheels motor power
-            FrontLeft.setPower(frontLeftPower);    // Sets the front left wheel's power
-            BackLeft.setPower(backLeftPower);     // Sets the back left wheel's power
-            FrontRight.setPower(frontRightPower);  // Sets the front right wheel's power
-            BackRight.setPower(backRightPower);   // Sets the back right wheel's power
-
         }
+        denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);    // calculate motor movement math and adjust according to lift height or manual precision mode selection
+
+        // check for Turbo or Precision Mode
+        if (gamepad1.left_bumper) {         // Left bumper is being pressed
+            precision = 1;                  // set speed to full power - TURBO MODE
+        } else if (gamepad1.right_bumper) { // Right bumper is being pressed
+            precision = 4;                  // set speed to 1/4 power - PRECISION MODE
+        } else {
+            precision = 2;                  // reset default speed to half power
+        }
+
+        // calculate motor power
+        denominator = denominator * precision;          // this adjusts motor speed to the desired precision level
+        frontLeftPower = (y + x + rx) / denominator;    // Does math to convert stick movement to motor powers
+        backLeftPower = (y - x + rx) / denominator;     // Does math to convert stick movement to motor powers
+        frontRightPower = (y - x - rx) / denominator;   // Does math to convert stick movement to motor powers
+        backRightPower = (y + x - rx) / denominator;    // Does math to convert stick movement to motor powers
+
+        // issue Drive Wheels motor power
+        FrontLeft.setPower(frontLeftPower);    // Sets the front left wheel's power
+        BackLeft.setPower(backLeftPower);     // Sets the back left wheel's power
+        FrontRight.setPower(frontRightPower);  // Sets the front right wheel's power
+        BackRight.setPower(backRightPower);   // Sets the back right wheel's power
     }
 
     public void PIDcalc(double intakePos, double liftPos) {
@@ -494,7 +484,6 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         RightLift.setPower(LiftPower);
         IntakeLeft.setPower(ExtendPower);
         IntakeRight.setPower(ExtendPower);
-
     }
 
     public void IntakeV4BCalc() {
