@@ -56,6 +56,8 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
     private double V4Bpos = 1;
     private double Flex = 0;
     private double Yaw = 0;
+    private double IntakePos;
+    private double LiftPos;
     private boolean Transfered = false;
 
     private enum SampleState {
@@ -174,8 +176,8 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
 
-            double IntakePos = IntakeLeft.getCurrentPosition();    // reads current position for intake and lift
-            double LiftPos = LeftLift.getCurrentPosition();
+            IntakePos = IntakeLeft.getCurrentPosition();    // reads current position for intake and lift
+            LiftPos = LeftLift.getCurrentPosition();
 
             DriveControls();                           // calls method to control chassis
 
@@ -190,21 +192,6 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
                     else {
                         OuttakeV4B.setPosition(1);
                         OuttakeWrist.setPosition(.03);
-                    }
-
-                    if(IntakePos <= 50 && Transfer_Delay.seconds() >= 2){
-                        Flex = 0;
-                        V4Bpos = 1;
-                    }
-                    else if(Transfer_Delay.seconds() >= 2){
-                        if (gamepad1.left_trigger > 0){              // TODO - this seems redundant as the forumla does all of this on it's own
-                            V4Bpos = 0.5*(1-(gamepad1.left_trigger)); //Control for variable virtual four bar height when in INTAKE state
-                        }
-                        else {
-                            V4Bpos = .5;
-                        }
-                        //  V4Bpos = 0.5*(1-(gamepad1.left_trigger));  //Control for variable virtual four bar height when in INTAKE state
-                        Flex = .63;
                     }
                     break;
 
@@ -233,7 +220,7 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
                 }
             }
 
-            PIDcalc(IntakePos, LiftPos);        // call PID calculation method for lift and extension control
+            PIDCalc(IntakePos, LiftPos);        // call PID calculation method for lift and extension control
 
             RunTelemetry(IntakePos, LiftPos);    // calls telemetry method to write to driver hub
         }
@@ -288,6 +275,19 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
                 }
                 else {
                     Yaw = 0;
+                }
+                if(intakePos <= 50 && Transfer_Delay.seconds() >= 2){
+                    Flex = 0;
+                    V4Bpos = 1;
+                }
+                else if(Transfer_Delay.seconds() >= 2) {
+                    if (gamepad1.left_trigger > 0) {              // TODO - this seems redundant as the forumla does all of this on it's own
+                        V4Bpos = 0.5 * (1 - (gamepad1.left_trigger)); //Control for variable virtual four bar height when in INTAKE state
+                    } else {
+                        V4Bpos = .5;
+                    }
+                    //  V4Bpos = 0.5*(1-(gamepad1.left_trigger));  //Control for variable virtual four bar height when in INTAKE state
+                    Flex = .63;
                 }
                 break;
             case TRANSFER:
@@ -469,7 +469,7 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         BackRight.setPower(backRightPower);   // Sets the back right wheel's power
     }
 
-    public void PIDcalc(double intakePos, double liftPos) {
+    public void PIDCalc(double intakePos, double liftPos) {
         LiftController.setPID(Lp, Li, Ld);
         ExtendController.setPID(Ep, Ei, Ed);
 
