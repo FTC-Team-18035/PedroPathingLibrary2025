@@ -39,7 +39,7 @@ public class TeleOpWithPID extends LinearOpMode {
     private double backRightPower = 0;     // declare motor power variable
     private double denominator = 1;        // declare motor power calculation variable
 
-    private final int MAX_TARGET_LIFT = 2825;       // The max Lift Height
+    private final int MAX_TARGET_LIFT = 2655;       // The max Lift Height
     private final int MAX_EXTENSION_LENGTH = 415;   // The max Extension Length
 
     private double LiftPower = .9;                  // The Power set to the lift
@@ -54,6 +54,7 @@ public class TeleOpWithPID extends LinearOpMode {
     private ElapsedTime Transfer_Delay = new ElapsedTime();
     private ElapsedTime ClawTime = new ElapsedTime();           // Timer to keep track since the claw was used last
 
+    private ElapsedTime PegLegTime = new ElapsedTime();         // Timer to keep track of how long the peg leg is out
     private ElapsedTime ClawDelay = new ElapsedTime();
 
     public double LeftServo;
@@ -117,7 +118,8 @@ public class TeleOpWithPID extends LinearOpMode {
         Servo OuttakeClaw = hardwareMap.servo.get("Outtake Claw");            // Ehub Port 0 // If Slides Up O Activates This Claw
         Servo OuttakeWrist = hardwareMap.servo.get("Outtake Wrist");          // Ehub Port 1 // Preset To Go To Delivery Position With Triangle
         Servo OuttakeV4B = hardwareMap.servo.get("Outtake V4B");   // Ehub Port 2 // Preset With Triangle
-        // Servo LeftHook = hardwareMap.servo.get("Left Hook");                  // Ehub Port 4 // Both Players Press A Button TBD Which
+
+        Servo PegLeg = hardwareMap.servo.get("Peg Leg");            // Ehub Port 5 // Gamepad 2 Dpad down
 
         LeftServo = Flex - (.5 * Yaw);
         RightServo = Flex + (.5 * Yaw);
@@ -167,6 +169,7 @@ public class TeleOpWithPID extends LinearOpMode {
         //   LeftHook.setPosition(0);    // Sets the left hook to the starting position
         //   RightHook.setPosition(0);   // Sets the right hook to the starting position
 
+        PegLeg.setPosition(0);
 
         waitForStart();
         while (opModeIsActive()){
@@ -305,6 +308,13 @@ public class TeleOpWithPID extends LinearOpMode {
 
                 case CLIMB:
 
+                    if(gamepad1.a) {
+                        PegLeg.setPosition(1);
+                    }
+                    else {
+                        PegLeg.setPosition(0);
+                    }
+
                     if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){
                         TargetLift = TargetLift + 10;
                     }
@@ -319,6 +329,7 @@ public class TeleOpWithPID extends LinearOpMode {
             }
             if(gamepad1.dpad_up && gamepad2.dpad_up){
                 TargetLift = MAX_TARGET_LIFT - 10;
+                PegLegTime.reset();
                 state = State.CLIMB;
             }
             if(Transfered){
