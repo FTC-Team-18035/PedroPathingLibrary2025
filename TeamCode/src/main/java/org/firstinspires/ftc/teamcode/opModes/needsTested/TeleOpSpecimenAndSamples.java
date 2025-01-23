@@ -38,7 +38,7 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
     private double backRightPower = 0;     // declare motor power variable
     private double denominator = 1;        // declare motor power calculation variable
 
-    private final int MAX_TARGET_LIFT = 2825;       // The max Lift Height
+    private final int MAX_TARGET_LIFT = 2655;       // The max Lift Height - updated 1/23/25
     private final int MAX_EXTENSION_LENGTH = 415;   // The max Extension Length
 
     private int precision = 2;                                  // chassis motor power reduction factor 1
@@ -109,11 +109,12 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         // Servo LeftIntakeV4B = hardwareMap.servo.get("Left Intake V4B");  // Chub Port 4 // --------------------------
         //  Servo RightHook = hardwareMap.servo.get("Right Hook");          // Chub Port 5 // Linked To LeftHook Activated At The Same Time
 
-        OuttakeClaw = hardwareMap.servo.get("Outtake Claw");            // Ehub Port 0 // If Slides Up O Activates This Claw
+        OuttakeClaw = hardwareMap.servo.get("Outtake Claw");            // Ehub Port 0 // If Slides Up gp1.O Activates This Claw
         OuttakeWrist = hardwareMap.servo.get("Outtake Wrist");          // Ehub Port 1 // Preset To Go To Delivery Position With Triangle
-        OuttakeV4B = hardwareMap.servo.get("Outtake V4B");   // Ehub Port 2 // Preset With Triangle
-        // Servo LeftHook = hardwareMap.servo.get("Left Hook");                  // Ehub Port 4 // Both Players Press A Button TBD Which
-
+        OuttakeV4B = hardwareMap.servo.get("Outtake V4B");              // Ehub Port 2 // Preset With Triangle
+        // Servo LeftHook = hardwareMap.servo.get("Left Hook");                 // Ehub Port 4 // Both Players Press A Button TBD Which
+        Servo PegLeg = hardwareMap.servo.get("Peg Leg");                // Ehub Port 5 // Gamepad 2 Dpad down
+        
         LeftServo = Flex - (.5 * Yaw);
         RightServo = Flex + (.5 * Yaw);
 
@@ -140,17 +141,15 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
 
 
         
-        //****************************** SET MOTORS TO BRAKE MODE *****************************************************
-        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
-        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to be locked when stopped
-        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);     // Sets the motor to be locked when stopped
-        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
-
-        LeftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);     // Sets the motor to be locked when stopped
-        RightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to be locked when stopped
-
-        IntakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to be locked when stopped
-        IntakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);  // Sets the motor to be locked when stopped
+        //****************************** SET MOTORS TO FLOAT MODE *****************************************************
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to coast when stopped
+        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to coast when stopped
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);     // Sets the motor to coast when stopped
+        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to coast when stopped
+        LeftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);     // Sets the motor to coast when stopped
+        RightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);    // Sets the motor to coast when stopped
+        IntakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to coast when stopped
+        IntakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);  // Sets the motor to coast when stopped
 
         //***************************** RESET SERVOS ***********************************************************
         IntakeClaw.setPosition(0);    // Closes Intake Claw
@@ -165,13 +164,12 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         //RightIntakeV4B.setPosition(1);  // Sets the intake virtual four bar to the starting position
 
         OuttakeWrist.setPosition(0);    // Sets the outtake wrist to the starting position
-
         OuttakeV4B.setPosition(1);  // Sets the outtake virtual four bar to the starting position
         // RightOuttakeV4B.setPosition(0); // Sets the outtake virtual four bar to the starting position
-
         //   LeftHook.setPosition(0);    // Sets the left hook to the starting position
         //   RightHook.setPosition(0);   // Sets the right hook to the starting position
-
+        
+        PegLeg.setPosition(0);
 
         waitForStart();
         while (opModeIsActive()){
@@ -364,6 +362,12 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
                 break;
 
             case CLIMB:
+                if(gamepad1.a) {                            // driver 1 control of pegleg extension/retraction
+                    PegLeg.setPosition(1);
+                }
+                else {
+                    PegLeg.setPosition(0);
+                }
                 if(gamepad2.dpad_down){
                     TargetLift = 600;
                     sampleState = SampleState.INTAKE;
