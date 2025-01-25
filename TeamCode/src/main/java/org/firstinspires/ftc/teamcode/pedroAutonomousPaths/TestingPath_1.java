@@ -29,7 +29,7 @@ public class TestingPath_1 extends OpMode {
 
     private final Pose farLeftPose = new Pose(118, 118, Math.toRadians(180));
 
-    private final Pose nearLeftPose = new Pose(27,118, Math.toRadians(270));
+    private final Pose nearLeftPose = new Pose(27, 118, Math.toRadians(270));
 
     private final Pose nearRightPose = new Pose(27, 33, Math.toRadians(0));
 
@@ -50,28 +50,28 @@ public class TestingPath_1 extends OpMode {
     }
 
     public void autonomousPathUpdate() {
-        switch(pathState) {
+        switch (pathState) {
             case 0:
                 follower.followPath(driveFarRight);
                 setPathValue(1);
                 break;
 
             case 1:
-                if(follower.getPose().getX() > (farRightPose.getX() - 1) && follower.getPose().getY() > (farRightPose.getY() - 1)) {
+                if (follower.getPose().getX() > (farRightPose.getX() - 1) && follower.getPose().getY() > (farRightPose.getY() - 1)) {
                     follower.followPath(driveFarLeft);
                     setPathValue(2);
                 }
                 break;
 
             case 2:
-                if(follower.getPose().getX() > (farLeftPose.getX() - 1) && follower.getPose().getY() > (farLeftPose.getY() - 1)) {
+                if (follower.getPose().getX() > (farLeftPose.getX() - 1) && follower.getPose().getY() > (farLeftPose.getY() - 1)) {
                     follower.followPath(driveNearLeft);
                     setPathValue(3);
                 }
                 break;
 
             case 3:
-                if(follower.getPose().getX() > (nearLeftPose.getX() - 1) && follower.getPose().getY() > (nearLeftPose.getY() - 1)) {
+                if (follower.getPose().getX() > (nearLeftPose.getX() - 1) && follower.getPose().getY() > (nearLeftPose.getY() - 1)) {
                     follower.followPath(driveNearRight);
                     setPathValue(-1);
                 }

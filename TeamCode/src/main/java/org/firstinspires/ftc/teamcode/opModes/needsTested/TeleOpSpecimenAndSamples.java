@@ -30,7 +30,7 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
 
     private DcMotorEx LeftLift, RightLift, IntakeLeft, IntakeRight;    // Motor and Servo Declarations
     private DcMotor FrontLeft, FrontRight, BackLeft, BackRight;
-    private Servo RightIntakeWrist, LeftIntakeWrist, OuttakeV4B, OuttakeWrist, IntakeV4B, IntakeClaw, OuttakeClaw;
+    private Servo RightIntakeWrist, LeftIntakeWrist, OuttakeV4B, OuttakeWrist, IntakeV4B, IntakeClaw, OuttakeClaw, PegLeg;
 
     private double frontLeftPower = 0;     // declare motor power variable
     private double backLeftPower = 0;      // declare motor power variable
@@ -113,7 +113,7 @@ public class TeleOpSpecimenAndSamples extends LinearOpMode {
         OuttakeWrist = hardwareMap.servo.get("Outtake Wrist");          // Ehub Port 1 // Preset To Go To Delivery Position With Triangle
         OuttakeV4B = hardwareMap.servo.get("Outtake V4B");              // Ehub Port 2 // Preset With Triangle
         // Servo LeftHook = hardwareMap.servo.get("Left Hook");                 // Ehub Port 4 // Both Players Press A Button TBD Which
-        Servo PegLeg = hardwareMap.servo.get("Peg Leg");                // Ehub Port 5 // Gamepad 2 Dpad down
+        PegLeg = hardwareMap.servo.get("Peg Leg");                // Ehub Port 5 // Gamepad 2 Dpad down
         
         LeftServo = Flex - (.5 * Yaw);
         RightServo = Flex + (.5 * Yaw);
