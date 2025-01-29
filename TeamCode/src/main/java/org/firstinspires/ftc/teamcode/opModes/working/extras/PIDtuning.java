@@ -8,6 +8,7 @@ import com.pedropathing.localization.Encoder;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -44,7 +45,7 @@ public class PIDtuning extends OpMode {
     private DcMotorEx IntakeLeft;
     private DcMotorEx IntakeRight;
     private CRServo OuttakeServo;
-    private Encoder Outtake;
+    private AnalogInput Outtake;
 
     @Override
     public void init(){
@@ -59,14 +60,14 @@ public class PIDtuning extends OpMode {
         IntakeRight = hardwareMap.get(DcMotorEx.class, "Intake Right");
 
         OuttakeServo = hardwareMap.get(CRServo.class, "Outtake Wrist");
-        Outtake = hardwareMap.get(Encoder.class, "Encoder Port");
+        AnalogInput Outtake = hardwareMap.get(AnalogInput.class, "Outtake V4B");
+
 
         LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        Outtake.reset();
 
         LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -82,21 +83,33 @@ public class PIDtuning extends OpMode {
     @Override
     public void loop(){
         LiftController.setPID(Lp, Li, Ld);
+
         OuttakeController.setPID(Op, Oi, Od);
+
         ExtendController.setPID(Ep, Ei, Ed);
         int LiftPos = LeftLift.getCurrentPosition();
         int ExtendPos = IntakeLeft.getCurrentPosition();
-        double OuttakeNormalize = Math.toIntExact((long) Outtake.getDeltaPosition());
-        double OuttakePos = OuttakeNormalize;
+
+        double position = Outtake.getVoltage() / 3.3 * 360;
+        double OuttakeMultiplier = 5.5;
+        double OuttakePos = position * OuttakeMultiplier;
+
         double Lpid = LiftController.calculate(LiftPos, LiftTarget);
         double Epid = ExtendController.calculate(ExtendPos, ExtendTarget);
+
         double Opid = OuttakeController.calculate(OuttakePos, OuttakeTarget);
+
         double LiftFF = Math.cos(Math.toRadians(LiftTarget / lift_ticks_in_degrees)) * Lf;
         double ExtendFF = Math.cos(Math.toRadians(ExtendTarget / extend_ticks_in_degrees)) * Ef;
+
         double OuttakeFF = Math.cos(Math.toRadians(OuttakeTarget / outtake_ticks_in_degrees)) * Of;
+
+
+
 
         double LiftPower = Lpid + LiftFF;
         double ExtendPower = Epid + ExtendFF;
+
         double OuttakePower = Opid + OuttakeFF;
 
         LeftLift.setPower(LiftPower);
