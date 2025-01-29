@@ -45,7 +45,7 @@ public class PIDtuning extends OpMode {
     private DcMotorEx IntakeLeft;
     private DcMotorEx IntakeRight;
     private CRServo OuttakeServo;
-    private AnalogInput Outtake;
+    private AnalogInput OuttakeInput;
 
     @Override
     public void init(){
@@ -60,7 +60,7 @@ public class PIDtuning extends OpMode {
         IntakeRight = hardwareMap.get(DcMotorEx.class, "Intake Right");
 
         OuttakeServo = hardwareMap.get(CRServo.class, "Outtake Wrist");
-        AnalogInput Outtake = hardwareMap.get(AnalogInput.class, "Outtake V4B");
+        OuttakeInput = hardwareMap.get(AnalogInput.class, "Outtake V4B");
 
 
         LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -90,9 +90,9 @@ public class PIDtuning extends OpMode {
         int LiftPos = LeftLift.getCurrentPosition();
         int ExtendPos = IntakeLeft.getCurrentPosition();
 
-        double position = Outtake.getVoltage() / 3.3 * 360;
-        double OuttakeMultiplier = 5.5;
-        double OuttakePos = position * OuttakeMultiplier;
+        double position = OuttakeInput.getVoltage() / 3.3 * 360;
+        //double OuttakeMultiplier = 5.5;
+        double OuttakePos = position;
 
         double Lpid = LiftController.calculate(LiftPos, LiftTarget);
         double Epid = ExtendController.calculate(ExtendPos, ExtendTarget);
@@ -103,8 +103,6 @@ public class PIDtuning extends OpMode {
         double ExtendFF = Math.cos(Math.toRadians(ExtendTarget / extend_ticks_in_degrees)) * Ef;
 
         double OuttakeFF = Math.cos(Math.toRadians(OuttakeTarget / outtake_ticks_in_degrees)) * Of;
-
-
 
 
         double LiftPower = Lpid + LiftFF;
