@@ -149,9 +149,11 @@ public class TeleOpWithPID extends LinearOpMode {
         IntakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);  // Sets the motor to be locked when stopped
 
         //***************************** RESET SERVOS ***********************************************************
+
+
         IntakeClaw.setPosition(0);    // Closes Intake Claw
 
-        OuttakeClaw.setPosition(0);   // Closes Outtake Claw
+        OuttakeClaw.setPosition(.45);   // Closes Outtake Claw
 
         LeftServo = Math.max(0, Math.min(1, Flex - (.5 * Yaw)));
         RightServo = Math.max(0, Math.min(1, Flex + (.5 * Yaw)));
@@ -230,8 +232,8 @@ public class TeleOpWithPID extends LinearOpMode {
                     }
                     if(LeftLift.getCurrentPosition() < 484 && Transfer_Delay.seconds() >= .6){
                         OuttakeClawClosed = true;
-                        OuttakeClaw.setPosition(1);
-                        if(OuttakeClaw.getPosition() == 1 && Transfer_Delay.seconds() >= 1.1){
+                        OuttakeClaw.setPosition(0);
+                        if(OuttakeClaw.getPosition() == 0 && Transfer_Delay.seconds() >= 1.1){
                             IntakeClawClosed = false;
                             IntakeClaw.setPosition(0);
                         }
@@ -252,12 +254,12 @@ public class TeleOpWithPID extends LinearOpMode {
                     }
                     if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3){
                         ClawTime.reset();
-                        OuttakeClaw.setPosition(.5);
+                        OuttakeClaw.setPosition(0);
                         OuttakeClawClosed = true;
                     }
                     else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
-                        OuttakeClaw.setPosition(0);
+                        OuttakeClaw.setPosition(.45);
                         OuttakeClawClosed = false;
                     }
                     if (gamepad2.right_bumper  && !IntakeClawClosed && ClawTime.seconds() >= .3){
@@ -290,12 +292,12 @@ public class TeleOpWithPID extends LinearOpMode {
                     }
                     if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3){
                         ClawTime.reset();
-                        OuttakeClaw.setPosition(.5);
+                        OuttakeClaw.setPosition(0);
                         OuttakeClawClosed = true;
                     }
                     else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
-                        OuttakeClaw.setPosition(0);
+                        OuttakeClaw.setPosition(.45);
                         OuttakeClawClosed = false;
                     }
                     if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){

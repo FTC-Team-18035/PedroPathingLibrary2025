@@ -117,6 +117,4 @@ android {
 }
 
 repositories {
-    mavenCentral()
 }
-

@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Disabled
 @TeleOp(name = "Claw Test")
 public class ClawTest extends LinearOpMode {
 
@@ -24,7 +23,7 @@ public class ClawTest extends LinearOpMode {
         while(opModeIsActive()){
             if (gamepad1.b && !OuttakeClawClosed && ClawTime.seconds() >= .3){
                 ClawTime.reset();
-                OuttakeClaw.setPosition(.5);
+                OuttakeClaw.setPosition(.45);
                 OuttakeClawClosed = true;
             }
             else if (gamepad1.b && OuttakeClawClosed && ClawTime.seconds() >= .3){
