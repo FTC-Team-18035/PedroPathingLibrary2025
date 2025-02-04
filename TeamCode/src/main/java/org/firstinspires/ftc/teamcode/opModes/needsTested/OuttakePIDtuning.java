@@ -27,11 +27,11 @@ public class OuttakePIDtuning extends OpMode {
     private CRServo OuttakeServo;
     private AnalogInput OuttakeInput;
 
-    boolean looped = false;
-    double position;
-    double additive;
+    boolean looped = false;                            // switch variable to account for 361+ rotation
+    double additive;                                   // formula additive for calculation 361+
+    double position;                                   // servo position variable
 
-    public static double OldVoltage, CurrentVoltage;
+    public static double OldVoltage, CurrentVoltage;    // voltage variables for CR servo control
 
     @Override
     public void init() {
@@ -40,36 +40,32 @@ public class OuttakePIDtuning extends OpMode {
 
         OuttakeServo = hardwareMap.get(CRServo.class, "Outtake Wrist");
         OuttakeInput = hardwareMap.get(AnalogInput.class, "Outtake V4B");
-
     }
 
     @Override
     public void loop(){
         OuttakeController.setPID(Op, Oi, Od);
 
-        CurrentVoltage = OuttakeInput.getVoltage();   //read  voltage
+        CurrentVoltage = OuttakeInput.getVoltage();   //read voltage
 
-        if (Math.abs(OldVoltage - CurrentVoltage) > 3) {          // compare last
-            looped = !looped;
+        if (Math.abs(OldVoltage - CurrentVoltage) > 3) {          // compare last voltage for jump
+            looped = !looped;                                     // toggle switch at rotate point
         }
-                                    // if over rate set additive to formula
-        if(looped) {
-            additive = 360;
+                                    
+        if(looped) {                                        // if over rotate set additive to formula
+            additive = 360;                                // full rotation additive for ticks > 360
         }
-        else { additive = 0; }
-        position = (CurrentVoltage / 3.3 * 360) + additive;
-        //double OuttakeMultiplier = 5.5;
-        double OuttakePos = position;
+        else { additive = 0; }                                // non additive for 0 to 360 ticks
+        position = ((CurrentVoltage / 3.3 * 360) + additive);  // convert voltage reading to degrees
 
+        double OuttakePos = position;                           // feed PID controller
         double Opid = OuttakeController.calculate(OuttakePos, OuttakeTarget);
-
         double OuttakeFF = Math.cos(Math.toRadians(OuttakeTarget / outtake_ticks_in_degrees)) * Of;
-
         double OuttakePower = Opid + OuttakeFF;
 
-        OuttakeServo.setPower(OuttakePower);
+        OuttakeServo.setPower(OuttakePower);                // set servo power by PID results
 
-        OldVoltage = CurrentVoltage;
+        OldVoltage = CurrentVoltage;                        // set comparative voltage for next loop
 
         telemetry.addData("Outtake pos ", OuttakePos);
         telemetry.addData("Outtake target ", OuttakeTarget);
