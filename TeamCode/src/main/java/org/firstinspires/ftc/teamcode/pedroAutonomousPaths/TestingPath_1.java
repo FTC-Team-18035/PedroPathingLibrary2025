@@ -25,13 +25,13 @@ public class TestingPath_1 extends OpMode {
 
     private final Pose startPose = new Pose(10, 33, Math.toRadians(0));
 
-    private final Pose farRightPose = new Pose(118, 33, Math.toRadians(90));
+    private final Pose farRightPose = new Pose(118, 33, Math.toRadians(0)); //Math.toRadians(90));
 
-    private final Pose farLeftPose = new Pose(118, 118, Math.toRadians(180));
+    private final Pose farLeftPose = new Pose(118, 118, Math.toRadians(0)); //Math.toRadians(180));
 
-    private final Pose nearLeftPose = new Pose(27, 118, Math.toRadians(270));
+    private final Pose nearLeftPose = new Pose(27, 118,Math.toRadians(0)); // Math.toRadians(270));
 
-    private final Pose nearRightPose = new Pose(27, 33, Math.toRadians(0));
+    private final Pose nearRightPose = new Pose(27, 33, Math.toRadians(0)); //Math.toRadians(0));
 
     private Path driveFarRight, driveFarLeft, driveNearLeft, driveNearRight;
 
