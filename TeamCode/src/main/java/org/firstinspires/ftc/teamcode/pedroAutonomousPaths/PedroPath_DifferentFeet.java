@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.pedroAutonomousPaths;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
-import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -16,8 +13,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "40 inches forwards")
-public class Forwards40Inches extends OpMode {
+@Autonomous(name = "Pedro Distance Test")
+public class PedroPath_DifferentFeet extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opModeTimer;
@@ -26,30 +23,30 @@ public class Forwards40Inches extends OpMode {
 
     private final Pose startPose = new Pose(0, 0, Math.toRadians(0));
 
-    private final Pose endPose = new Pose(40, 0, Math.toRadians(0));
 
-    private Path driveFarRight, driveFarLeft, driveNearLeft, driveNearRight, drive;
+
+    private Path driveFarRight, driveFarLeft, driveNearLeft, driveNearRight;
 
     public void buildPaths() {
        // driveFarRight = new Path(new BezierLine(new Point(startPose), new Point(farRightPose)));
        // driveFarRight.setLinearHeadingInterpolation(startPose.getHeading(), farRightPose.getHeading());
 
-        drive = new Path(new BezierLine(new Point(startPose), new Point(endPose)));
-        drive.setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading());
+
     }
 
     public void autonomousPathUpdate() {
         switch(pathState) {
             case 0:
-                follower.followPath(drive);
-                setPathValue(1);
-                break;
+                //follower.followPath(driveFarRight);
+                //setPathValue(1);
+                //break;
 
             case 1:
-                if(follower.getPose().getX() > (endPose.getX() - 1) && follower.getPose().getY() > (endPose.getY() - 1)) {
-                    setPathValue(-1);
-                }
-                break;
+                //if(follower.getPose().getX() > (farRightPose.getX() - 1) && follower.getPose().getY() > (farRightPose.getY() - 1)) {
+                  //  follower.followPath(driveFarLeft);
+                   // setPathValue(-1);
+                //}
+                //break;
 
 
         }

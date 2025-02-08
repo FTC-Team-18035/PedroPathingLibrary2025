@@ -1,14 +1,11 @@
-package org.firstinspires.ftc.teamcode.opModes.needsTested;
+package org.firstinspires.ftc.teamcode.opModes.working.extras;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
@@ -18,8 +15,8 @@ public class CurrentSensingTest extends LinearOpMode {
     private DcMotorEx RightLift;
     private DcMotorEx IntakeLeft;
     private DcMotorEx IntakeRight;
-    private static double HorizontalCurrentThreshold = 0;
-    private static double VerticalCurrentThreshold = 0;
+    private static double HorizontalCurrentThreshold = 2;
+    private static double VerticalCurrentThreshold = 1;
     private double HorizontalCurrent;
     private double VerticalCurrent;
     private double LiftPower;
@@ -46,36 +43,42 @@ public class CurrentSensingTest extends LinearOpMode {
         IntakeLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);   // Sets the motor to be locked when stopped
         IntakeRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);  // Sets the motor to be locked when stopped
         waitForStart();
-        while (opModeIsActive()){
-            HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);
-            VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);
-            ExtendPower = gamepad1.left_stick_x;
-            LiftPower = gamepad1.right_stick_x;
-            if (gamepad1.x) {
-                ExtendPower = -.25;
+        while (opModeIsActive()) {
+            if (opModeIsActive()) {
+
+                HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);
+                VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);
+                ExtendPower = gamepad1.left_stick_x;
+                LiftPower = gamepad1.right_stick_x;
+                if (gamepad1.x) {
+                    ExtendPower = -.25;
+                    IntakeLeft.setPower(ExtendPower);
+                    IntakeRight.setPower(ExtendPower);
+                    while (IntakeLeft.getCurrent(CurrentUnit.AMPS) < HorizontalCurrentThreshold) {
+                    }
+                    IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    LiftPower = -.25;
+                    LeftLift.setPower(LiftPower);
+                    RightLift.setPower(LiftPower);
+                    while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) {
+                    }
+                    LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    break;
+                }
+                LeftLift.setPower(LiftPower);
+                RightLift.setPower(LiftPower);
                 IntakeLeft.setPower(ExtendPower);
                 IntakeRight.setPower(ExtendPower);
-                while(IntakeLeft.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold){
-                }
-                LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                LiftPower = -.25;
-                LeftLift.setPower(LiftPower);
-                IntakeRight.setPower(LiftPower);
-                while(RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold){
-                }
-                IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                telemetry.addData("Horizontal Current Draw", HorizontalCurrent);
+                telemetry.addData("Horizontal Position", IntakeLeft.getCurrentPosition());
+                telemetry.addData("Vertical Current Draw", VerticalCurrent);
+                telemetry.addData("Vertical Position", RightLift.getCurrentPosition());
+                telemetry.addData("Left X", gamepad1.left_stick_x);
+                telemetry.addData("Right X", gamepad1.right_stick_x);
+                telemetry.update();
             }
-            LeftLift.setPower(LiftPower);
-            RightLift.setPower(LiftPower);
-            IntakeLeft.setPower(ExtendPower);
-            IntakeRight.setPower(ExtendPower);
-            telemetry.addData("Horizontal Current Draw", HorizontalCurrent);
-            telemetry.addData("Horizontal Position", VerticalCurrent);
-            telemetry.addData("Vertical Current Draw", VerticalCurrent);
-            telemetry.addData("Vertical Position", VerticalCurrent);
-            telemetry.update();
         }
     }
 }
