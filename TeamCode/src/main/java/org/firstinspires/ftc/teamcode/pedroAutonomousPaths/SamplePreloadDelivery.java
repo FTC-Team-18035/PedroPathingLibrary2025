@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 import java.lang.annotation.Target;
 
 
-@Autonomous(name = "Sample Preload Delivery")
+@Autonomous(name = "Sample Preload Delivery", preselectTeleOp = "TeleOpCurrentSensing")
 public class SamplePreloadDelivery extends OpMode {
 
     private Follower follower;
