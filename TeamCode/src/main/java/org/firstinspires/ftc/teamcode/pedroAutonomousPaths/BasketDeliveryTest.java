@@ -35,17 +35,12 @@ public class BasketDeliveryTest extends OpMode {
     Servo IntakeV4B;     // Chub Port 3 // Preset To Swing Out With X
     // Servo LeftIntakeV4B = hardwareMap.servo.get("Left Intake V4B");       // Chub Port 4 // --------------------------
     //  Servo RightHook = hardwareMap.servo.get("Right Hook");                // Chub Port 5 // Linked To LeftHook Activated At The Same Time
-
-    Servo IntakeClaw;
-
+    Servo IntakeClaw, OuttakeV4B;
     Servo OuttakeClaw;            // Ehub Port 0 // If Slides Up O Activates This Claw
-    Servo OuttakeWrist;          // Ehub Port 1 // Preset To Go To Delivery Position With Triangle
-    Servo OuttakeV4B;
-
+    Servo OuttakeWrist;          // Ehub Port 1 // Preset To Go To Delivery Position With Triangl
     // LIFT
 
-    private DcMotorEx LeftLift;
-    private DcMotorEx RightLift;
+    private DcMotorEx LeftLift, RightLift;
 
     private static PIDController LiftController;
     public static double Lp = 0.015, Li = 0, Ld = 0.0002;
@@ -72,6 +67,10 @@ public class BasketDeliveryTest extends OpMode {
 
     public static double ExtendPos;
 
+    public static double IntakeClawPos = 0;
+    public static double OuttakeV4BPos = 0;
+    public static double IntakeV4BPos = 0;
+    public static double OuttakeClawPos = 0;
     private final int MAX_EXTENSION_LENGTH = 415;
 
     private boolean IntakeClawClosed = false;                   // claw holder variable
@@ -135,14 +134,25 @@ public class BasketDeliveryTest extends OpMode {
         switch (pathState) {
             case 0:
                 follower.followPath(scorePreLoad);
+                actionTimer.resetTimer();
                 setPathState(1);
                 break;
 
             case 1:
                 if(!follower.isBusy()) {
-
+                    // TargetLift = 2520;
+                    // if(actionTimer.seconds() >= 3) {
+                    //      OuttakeV4BPos = 0;
+                    //      OuttakeWrist.setPosition(.7);
+                    //}
+                    // if(.getElapsedTimeSeconds() >= 4) {
+                    //      OuttakeClawPos = 1;
+                    //}
+                    // TargetLift = 1;
+                    // OuttakeV4BPos = 1;
+                    // OuttakeWrist.setPosition(.03);
                     // Score Preload
-
+                    actionTimer.resetTimer();
                     follower.followPath(grabSample1, true);
                     setPathState(2);
                 }
@@ -150,9 +160,19 @@ public class BasketDeliveryTest extends OpMode {
 
             case 2:
                 if(!follower.isBusy()) {
-
+                    // TargetExtend = 415;
+                    // IntakeV4BPos = .3;
+                    // IntakeWrist.setPosition(.5);
+                    // LeftIntakeWrist.setPosition(-.5);
+                    //if(actionTimer.getElapsedTimeSeconds() >= 3) {
+                    //      IntakeClawPos = 1;
+                    //}
+                    // TargetExtend = 1;
+                    // IntakeV4BPos = 1;
+                    // RightIntakeWrist.setPosition(0);
+                    // LeftIntakeWrist.setPosition(0);
                     // Grab the 1st Sample
-
+                    actionTimer.resetTimer();
                     follower.followPath(deliverSample1, true);
                     setPathState(3);
                 }
@@ -160,9 +180,20 @@ public class BasketDeliveryTest extends OpMode {
 
             case 3:
                 if(!follower.isBusy()) {
-
+                    // TargetLift = 2520;
+                    // if(actionTimer.getElapsedTimeSeconds() >= 3) {
+                    //      OuttakeV4BPos = 0;
+                    //      OuttakeWrist.setPosition(.7);
+                    //}
+                    // if(actionTimer.getElapsedTimeSeconds() >= 4) {
+                    //      OuttakeClawPos = 1;
+                    //}
+                    // TargetLift = 1;
+                    // OuttakeV4BPos = 1;
+                    // OuttakeWrist.setPosition(.03);
                     // Deliver the 1st Sample
 
+                    actionTimer.resetTimer();
                     follower.followPath(grabSample2, true);
                     setPathState(4);
                 }
@@ -170,9 +201,20 @@ public class BasketDeliveryTest extends OpMode {
 
             case 4:
                 if(!follower.isBusy()) {
-
+                    // TargetExtend = 415;
+                    // IntakeV4BPos = .3;
+                    // IntakeWrist.setPosition(.5);
+                    // LeftIntakeWrist.setPosition(-.5);
+                    // if(actionTimer.getElapsedTimeSeconds() >= 3) {
+                    //      IntakeClawPos = 1;
+                    //}
+                    // TargetExtend = 1;
+                    // IntakeV4BPos = 1;
+                    // RightIntakeWrist.setPosition(0);
+                    // LeftIntakeWrist.setPosition(0);
                     // Grab the 2nd Sample
 
+                    actionTimer.resetTimer();
                     follower.followPath(deliverSample2, true);
                     setPathState(5);
                 }
@@ -180,9 +222,19 @@ public class BasketDeliveryTest extends OpMode {
 
             case 5:
                 if(!follower.isBusy()) {
-
+                    // TargetLift = 2520;
+                    // if(actionTimer.getElapsedTimeSeconds() >= 3) {
+                    //      OuttakeV4BPos = 0;
+                    //      OuttakeWrist.setPosition(.7);
+                    //}
+                    // if(actionTimer.getElapsedTimeSeconds() >= 4) {
+                    //      OuttakeClawPos = 1;
+                    //}
+                    // TargetLift = 1;
+                    // OuttakeV4BPos = 1;
+                    // OuttakeWrist.setPosition(.03);
                     // Deliver the 2nd Sample
-
+                    actionTimer.resetTimer();
                     follower.followPath(grabSample3, true);
                     setPathState(6);
                 }
@@ -190,7 +242,17 @@ public class BasketDeliveryTest extends OpMode {
 
             case 6:
                 if(!follower.isBusy()) {
-
+                    // TargetExtend = 315;
+                    // IntakeV4BPos = .3;
+                    // IntakeWrist.setPosition(.7);
+                    // LeftIntakeWrist.setPosition(-.7);
+                    // if(actionTimer.getElapsedTimeSeconds() >= 3) {
+                    //      IntakeClawPos = 1;
+                    //}
+                    // TargetExtend = 1;
+                    // IntakeV4BPos = 1;
+                    // RightIntakeWrist.setPosition(0);
+                    // LeftIntakeWrist.setPosition(0);
                     // Grab the 3rd Sample
 
                     follower.followPath(deliverSample3, true);
@@ -200,7 +262,17 @@ public class BasketDeliveryTest extends OpMode {
 
             case 7:
                 if(!follower.isBusy()) {
-
+                    // TargetLift = 2520;
+                    // if(actionTimer.getElapsedTimeSeconds() >= 3) {
+                    //      OuttakeV4BPos = 0;
+                    //      OuttakeWrist.setPosition(.7);
+                    //}
+                    // if(actionTimer.getElapsedTimeSeconds() >= 4) {
+                    //      OuttakeClawPos = 1;
+                    //}
+                    // TargetLift = 1;
+                    // OuttakeV4BPos = 1;
+                    // OuttakeWrist.setPosition(.03);
                     // Deliver the 3rd Sample
 
                     follower.followPath(park, true);
@@ -230,10 +302,36 @@ public class BasketDeliveryTest extends OpMode {
         follower.update();
         autonomousUpdatePaths();
 
+        RunClaws("Intake", IntakeClawPos);
+        RunClaws("Outtake", OuttakeClawPos);
+        RunV4B("Intake", IntakeV4BPos);
+        RunV4B("Outtake", OuttakeV4BPos);
+
+        RunLift(TargetLift, MAX_TARGET_LIFT);
+        RunExtension(TargetExtend, MAX_EXTENSION_LENGTH);
+
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
+
+        telemetry.addData("Intake Claw Pos", IntakeClawPos);
+        telemetry.addData("Intake Claw", IntakeClaw.getPosition());
+
+        telemetry.addData("Outtake Claw Pos", OuttakeClawPos);
+        telemetry.addData("Outtake Claw", OuttakeClaw.getPosition());
+
+        telemetry.addData("Intake V4B Pos", IntakeV4BPos);
+        telemetry.addData("Intake V4B", IntakeV4B.getPosition());
+
+        telemetry.addData("Outtake V4B Pos", OuttakeV4BPos);
+        telemetry.addData("Outtake V4B", OuttakeV4B.getPosition());
+
+        telemetry.addData("Target Lift", TargetLift);
+        telemetry.addData("Lift Pos", LeftLift.getCurrentPosition());
+
+        telemetry.addData("Target Extend", TargetExtend);
+        telemetry.addData("Extend Pos", IntakeLeft.getCurrentPosition());
         telemetry.update();
 
     }
