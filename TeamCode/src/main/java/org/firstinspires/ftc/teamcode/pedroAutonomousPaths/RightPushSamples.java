@@ -18,14 +18,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.opModes.needsTested.TeleOpWithCurrentSensing;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-import java.lang.annotation.Target;
 
-
-@Autonomous(name = "Sample Preload Delivery")
-public class SamplePreloadDelivery extends OpMode {
+@Autonomous(name = "Push Samples", preselectTeleOp = "TeleOpWithCurrentSensing")
+public class RightPushSamples extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opModeTimer;
@@ -52,83 +51,44 @@ public class SamplePreloadDelivery extends OpMode {
     Servo OuttakeClaw;
     Servo OuttakeWrist;
 
-    private final Pose startPose = new Pose(11.5, 119, Math.toRadians(-45));
+    private final Pose startPose = new Pose(5.8, 54, Math.toRadians(0));
 
-    private final Pose scorePose = new Pose(19, 128, Math.toRadians(-45));
-    private final Pose endPose = new Pose(16, 130, Math.toRadians(-45)); // 11 to the left
-    private final Pose pullForwardsPose = new Pose(23, 11, Math.toRadians(-45));
-    private final Pose parkPose1 = new Pose(60, 97, Math.toRadians(90));
-    private final Pose parkControlPose = new Pose(29, 97, Math.toRadians(90));
-    private final Pose parkControlPose2 = new Pose(58, 140, Math.toRadians(90));
-    private Path scorePath, endPath, pullForwardsPath, parkPath1, parkPath2;
+    private final Pose endPose1 = new Pose(26, 35, Math.toRadians(0));
+
+    private final Pose endPose2 = new Pose(60, 35, Math.toRadians(0));
+
+    private Path drivePath1, drivePath2, pullForwardsPath, parkPath1, parkPath2;
 
     public void buildPaths() {
        // driveFarRight = new Path(new BezierLine(new Point(startPose), new Point(farRightPose)));
        // driveFarRight.setLinearHeadingInterpolation(startPose.getHeading(), farRightPose.getHeading());
-        endPath = new Path(new BezierLine(new Point(scorePose), new Point(endPose)));
-        endPath.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading());
+        drivePath1 = new Path(new BezierLine(new Point(startPose), new Point(endPose1)));
+        drivePath1.setLinearHeadingInterpolation(startPose.getHeading(), endPose1.getHeading());
 
-        scorePath = new Path(new BezierLine(new Point(startPose), new Point(scorePose)));
-        scorePath.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
-
-        pullForwardsPath = new Path(new BezierLine(new Point(endPose), new Point(scorePose)));
-        pullForwardsPath.setLinearHeadingInterpolation(endPose.getHeading(), scorePose.getHeading());
-
-        parkPath1 = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkControlPose2), new Point(parkPose1)));
-        parkPath1.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose1.getHeading());
+        drivePath2 = new Path(new BezierLine(new Point(endPose1), new Point(endPose2)));
+        drivePath2.setLinearHeadingInterpolation(endPose1.getHeading(), endPose2.getHeading());
 
     }
 
     public void autonomousPathUpdate() {
         switch(pathState) {
             case 0:
-                follower.followPath(scorePath);
+                follower.followPath(drivePath1);
                 actionTimer.resetTimer();
                 setPathValue(1);
                 break;
 
             case 1:
                 if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    TargetLift = 2520;
-
-                    OuttakeV4B.setPosition(0);
-                    OuttakeWrist.setPosition(.7);
+                    follower.followPath(drivePath2);
                     setPathValue(2);
                 }
                 break;
-
             case 2:
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        follower.followPath(endPath);
-                        setPathValue(3);
-                    }
-                break;
-            case 3:
-                if(actionTimer.getElapsedTimeSeconds() > 4.5) {
-                    OuttakeClaw.setPosition(.45);
-                    actionTimer.resetTimer();
-                    setPathValue(4);
-                }
-                break;
-            case 4:
                 if(actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(pullForwardsPath);
-                    actionTimer.resetTimer();
-                    setPathValue(5);
-                }
-                break;
-            case 5:
-                if(actionTimer.getElapsedTimeSeconds() > 3) {
-                    TargetLift = 400;
-                    OuttakeV4B.setPosition(.25);
-                    OuttakeWrist.setPosition(.7);
-                    setPathValue(6);
-                }
-                break;
-            case 6:
-                    follower.followPath(parkPath1);
                     setPathValue(-1);
-                    break;
+                }
+
         }
     }
 
@@ -143,7 +103,7 @@ public class SamplePreloadDelivery extends OpMode {
         autonomousPathUpdate();
         RunLift(TargetLift, MAX_TARGET_LIFT);
 
-        if(opModeTimer.getElapsedTimeSeconds() > 15) {
+        if(opModeTimer.getElapsedTimeSeconds() > 10) {
             requestOpModeStop();
         }
         // Feedback to Driver Hub
