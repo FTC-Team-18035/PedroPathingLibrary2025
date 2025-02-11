@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.working.main;
+package org.firstinspires.ftc.teamcode.opModes.working.extras;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import java.security.cert.Extension;
 
 @TeleOp(name = "Manual Transfer Delivery")
 public class ManualTransferTest extends LinearOpMode {

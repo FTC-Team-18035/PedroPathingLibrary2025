@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroAutonomousPaths;
+package org.firstinspires.ftc.teamcode.opModes.working.main;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -21,10 +21,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-import java.lang.annotation.Target;
 
-
-@Autonomous(name = "Sample Preload Delivery", preselectTeleOp = "TeleOpCurrentSensing")
+@Autonomous(name = "Sample Preload Delivery", preselectTeleOp = "TeleOpCurrentSensing", group = "Main")
 public class SamplePreloadDelivery extends OpMode {
 
     private Follower follower;

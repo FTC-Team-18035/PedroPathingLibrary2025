@@ -11,8 +11,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp
-public class TeleOpWithPID extends LinearOpMode {
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+@TeleOp(group = "main")
+public class TeleOpWithCurrentSensing extends LinearOpMode {
 
     private PIDController LiftController;
     private PIDController ExtendController;
@@ -42,8 +44,13 @@ public class TeleOpWithPID extends LinearOpMode {
     private final int MAX_TARGET_LIFT = 2655;       // The max Lift Height
     private final int MAX_EXTENSION_LENGTH = 415;   // The max Extension Length
 
-    private double LiftPower = .9;                  // The Power set to the lift
-    private double ExtensionPower = .5;            // The Power set to the extension
+    private static double HorizontalCurrentThreshold = 2;
+    private static double VerticalCurrentThreshold = 2;
+    private double HorizontalCurrent;
+    private double VerticalCurrent;
+
+    private double LiftPower;
+    private double ExtendPower;
 
     private int precision = 2;                                  // chassis motor power reduction factor 1
     private boolean IntakeClawClosed = false;                   // claw holder variable
@@ -63,6 +70,7 @@ public class TeleOpWithPID extends LinearOpMode {
     private double Flex = 0;
     private double Yaw = 0;
     private boolean Transfered = false;
+    private boolean Started = false;
 
     private enum State {
         INTAKE,
@@ -75,7 +83,7 @@ public class TeleOpWithPID extends LinearOpMode {
     State state = State.INTAKE;
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
         LiftController = new PIDController(Lp, Li, Ld);
         ExtendController = new PIDController(Ep, Ei, Ed);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -151,6 +159,8 @@ public class TeleOpWithPID extends LinearOpMode {
         //***************************** RESET SERVOS ***********************************************************
 
 
+        waitForStart();
+
         IntakeClaw.setPosition(0);    // Closes Intake Claw
 
         OuttakeClaw.setPosition(.45);   // Closes Outtake Claw
@@ -160,21 +170,43 @@ public class TeleOpWithPID extends LinearOpMode {
 
         LeftIntakeWrist.setPosition(LeftServo);    // Sets the intake wrist to the starting position // Left is 0 Right is 1
         RightIntakeWrist.setPosition(RightServo);   // Sets the intake wrist to the starting position // Left is 0 Right is 1
-        IntakeV4B.setPosition(.8);   // Sets the intake virtual four bar to the starting position
-        //RightIntakeV4B.setPosition(1);  // Sets the intake virtual four bar to the starting position
 
-        OuttakeWrist.setPosition(0);    // Sets the outtake wrist to the starting position
-
-        OuttakeV4B.setPosition(1);  // Sets the outtake virtual four bar to the starting position
-        //RightOuttakeV4B.setPosition(0); // Sets the outtake virtual four bar to the starting position
-
-        //   LeftHook.setPosition(0);    // Sets the left hook to the starting position
-        //   RightHook.setPosition(0);   // Sets the right hook to the starting position
-
+        OuttakeV4B.setPosition(.5);
+        IntakeV4B.setPosition(.8);
+        OuttakeWrist.setPosition(.25);
         PegLeg.setPosition(0);
 
-        waitForStart();
-        while (opModeIsActive()){
+        HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);
+        VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);
+        ExtendPower = -.25;
+        IntakeLeft.setPower(ExtendPower);
+        IntakeRight.setPower(ExtendPower);
+
+        while (IntakeLeft.getCurrent(CurrentUnit.AMPS) < HorizontalCurrentThreshold) {
+        }
+        IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LiftPower = -.25;
+        LeftLift.setPower(LiftPower);
+        RightLift.setPower(LiftPower);
+        while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) {
+        }
+        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        LeftLift.setPower(LiftPower);
+        RightLift.setPower(LiftPower);
+        IntakeLeft.setPower(ExtendPower);
+        IntakeRight.setPower(ExtendPower);
+
+        IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+
+        while (opModeIsActive()) {
             //*************************** DRIVE CONTROLS **************************************************
             // check for driving input
             double y = -gamepad1.left_stick_y;         // Remember, this is reversed!
@@ -185,62 +217,57 @@ public class TeleOpWithPID extends LinearOpMode {
                 x = -gamepad1.left_stick_x * 1.1;    // Counteract imperfect strafing
                 rx = gamepad1.right_stick_x;          // Measures turning
             }
-            switch(state) {
+            switch (state) {
                 case INTAKE:
-                    if (gamepad2.x){
+                    if (gamepad2.x) {
                         TargetExtend = MAX_EXTENSION_LENGTH;
-                    }
-                    else if(gamepad2.b){
+                    } else if (gamepad2.b) {
                         TargetExtend = 1;
                     }
-                    if (IntakeLeft.getCurrentPosition() <= 7 && IntakeClaw.getPosition() == .5){
+                    if (IntakeLeft.getCurrentPosition() <= 7 && IntakeClaw.getPosition() == .5) {
                         Transfer_Time.reset();
                         Transfer_Delay.reset();
                         Transfered = false;
                         state = State.TRANSFER;
                     }
-                    if (gamepad2.right_bumper && !IntakeClawClosed && ClawTime.seconds() >= .3){
+                    if (gamepad2.right_bumper && !IntakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         IntakeClaw.setPosition(.5);
                         IntakeClawClosed = true;
-                    }
-                    else if (gamepad2.right_bumper && IntakeClawClosed && ClawTime.seconds() >= 1){
+                    } else if (gamepad2.right_bumper && IntakeClawClosed && ClawTime.seconds() >= 1) {
                         ClawTime.reset();
                         IntakeClaw.setPosition(0);
                         IntakeClawClosed = false;
                     }
-                    if (gamepad2.dpad_left && TargetExtend < MAX_EXTENSION_LENGTH){
+                    if (gamepad2.dpad_left && TargetExtend < MAX_EXTENSION_LENGTH) {
                         TargetExtend = TargetExtend + 10;
-                    }
-                    else if (gamepad2.dpad_right && TargetExtend > 10){
+                    } else if (gamepad2.dpad_right && TargetExtend > 10) {
                         TargetExtend = TargetExtend - 10;
                     }
 
                     if (gamepad1.touchpad_finger_1) {
                         Yaw = gamepad1.touchpad_finger_1_x;
-                    }
-                    else {
+                    } else {
                         Yaw = 0;
                     }
                     break;
                 case TRANSFER:
                     if (Transfer_Time.seconds() >= .25) {
                         TargetLift = 480;
-                    }
-                    else {
+                    } else {
                         TargetLift = 800;
                     }
-                    if(LeftLift.getCurrentPosition() < 484 && Transfer_Delay.seconds() >= .6){
+                    if (LeftLift.getCurrentPosition() < 484 && Transfer_Delay.seconds() >= .6) {
                         OuttakeClawClosed = true;
                         OuttakeClaw.setPosition(0);
-                        if(OuttakeClaw.getPosition() == 0 && Transfer_Delay.seconds() >= 1.1){
+                        if (OuttakeClaw.getPosition() == 0 && Transfer_Delay.seconds() >= .85) {
                             IntakeClawClosed = false;
                             IntakeClaw.setPosition(0);
                         }
                     }
-                    if(IntakeClaw.getPosition() == 0){
+                    if (IntakeClaw.getPosition() == 0) {
                         V4Bpos = .75;
-                        if(Transfer_Delay.seconds() >= 1.5) {
+                        if (Transfer_Delay.seconds() >= .75) {
                             state = State.IDLE;
                             Transfered = true;
                         }
@@ -252,108 +279,99 @@ public class TeleOpWithPID extends LinearOpMode {
                         TargetLift = 2520;
                         state = State.OUTTAKE;
                     }
-                    if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3){
+                    if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         OuttakeClaw.setPosition(0);
                         OuttakeClawClosed = true;
-                    }
-                    else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
+                    } else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         OuttakeClaw.setPosition(.45);
                         OuttakeClawClosed = false;
                     }
-                    if (gamepad2.right_bumper  && !IntakeClawClosed && ClawTime.seconds() >= .3){
+                    if (gamepad2.right_bumper && !IntakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         IntakeClaw.setPosition(.5);
                         IntakeClawClosed = true;
-                    }
-                    else if (gamepad2.right_bumper && IntakeClawClosed && ClawTime.seconds() >= .3){
+                    } else if (gamepad2.right_bumper && IntakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         IntakeClaw.setPosition(0);
                         IntakeClawClosed = false;
                     }
-                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){
+                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10) {
                         TargetLift = TargetLift + 10;
-                    }
-                    else if (gamepad2.left_trigger >= .75 && TargetLift > 10){
+                    } else if (gamepad2.left_trigger >= .75 && TargetLift > 10) {
                         TargetLift = TargetLift - 10;
                     }
-                    if (gamepad2.a){
+                    if (gamepad2.a) {
                         TargetLift = 750;
                         Transfered = false;
                         state = State.INTAKE;
                     }
                     break;
                 case OUTTAKE:
-                    if (gamepad2.a){
+                    if (gamepad2.a) {
                         TargetLift = 750;
                         Transfered = false;
                         state = State.INTAKE;
                     }
-                    if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3){
+                    if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         OuttakeClaw.setPosition(0);
                         OuttakeClawClosed = true;
-                    }
-                    else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
+                    } else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         OuttakeClaw.setPosition(.45);
                         OuttakeClawClosed = false;
                     }
-                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){
+                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10) {
                         TargetLift = TargetLift + 10;
-                    }
-                    else if (gamepad2.left_trigger >= .75 && TargetLift > 10){
+                    } else if (gamepad2.left_trigger >= .75 && TargetLift > 10) {
                         TargetLift = TargetLift - 10;
                     }
                     break;
 
                 case CLIMB:
 
-                    if(gamepad1.a) {
+                    if (gamepad1.a) {
                         PegLeg.setPosition(1);
-                    }
-                    else {
+                    } else {
                         PegLeg.setPosition(0);
                     }
 
-                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10){
+                    if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10) {
                         TargetLift = TargetLift + 10;
-                    }
-                    else if (gamepad2.left_trigger >= .75 && TargetLift > 50){
+                    } else if (gamepad2.left_trigger >= .75 && TargetLift > 50) {
                         TargetLift = TargetLift - 50;
                     }
-                    if(gamepad2.dpad_down){
+                    if (gamepad2.dpad_down) {
                         TargetLift = 600;
                         state = State.INTAKE;
                     }
                     break;
             }
-            if(gamepad1.dpad_up && gamepad2.dpad_up){
+            if (gamepad1.dpad_up && gamepad2.dpad_up) {
                 TargetLift = MAX_TARGET_LIFT - 10;
                 PegLegTime.reset();
                 state = State.CLIMB;
             }
-            if(Transfered){
+            if (Transfered) {
                 OuttakeV4B.setPosition(0);
                 OuttakeWrist.setPosition(.7);
-            }
-            else {
+            } else {
                 OuttakeV4B.setPosition(1);
                 OuttakeWrist.setPosition(.03);
             }
 
-            if(IntakeLeft.getCurrentPosition() <= 50 && Transfer_Delay.seconds() >= 2){
+            if (IntakeLeft.getCurrentPosition() <= 50 && Transfer_Delay.seconds() >= 2) {
                 Flex = 0;
                 V4Bpos = 1;
 
-            }
-            else if(Transfer_Delay.seconds() >= 2){
-                if (gamepad1.left_trigger > 0){
-                    V4Bpos = 0.5*(1-(gamepad1.left_trigger)); //Control for variable virtual four bar height when in INTAKE state
+            } else if (Transfer_Delay.seconds() >= 2) {
+                if (gamepad1.left_trigger > 0) {
+                    V4Bpos = 0.5 * (1 - (gamepad1.left_trigger)); //Control for variable virtual four bar height when in INTAKE state
+                } else {
+                    V4Bpos = .5;
                 }
-                else {
-                    V4Bpos = .5;}
                 Flex = .63;
             }
 
@@ -415,6 +433,4 @@ public class TeleOpWithPID extends LinearOpMode {
 
         }
     }
-
-
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroAutonomousPaths;
+package org.firstinspires.ftc.teamcode.opModes.working.main;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Push Samples", preselectTeleOp = "TeleOpWithCurrentSensing")
+@Autonomous(name = "Push Samples", preselectTeleOp = "TeleOpWithCurrentSensing", group = "main")
 public class RightPushSamples extends OpMode {
 
     private Follower follower;
