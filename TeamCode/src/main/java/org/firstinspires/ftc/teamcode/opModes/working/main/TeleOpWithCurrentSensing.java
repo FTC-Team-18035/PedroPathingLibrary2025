@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(group = "main")
+@TeleOp(group = "Main")
 public class TeleOpWithCurrentSensing extends LinearOpMode {
 
     private PIDController LiftController;
@@ -71,7 +71,6 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
     private double Yaw = 0;
     private boolean Transfered = false;
     private boolean Started = false;
-
     private enum State {
         INTAKE,
         TRANSFER,
@@ -314,15 +313,6 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
                         Transfered = false;
                         state = State.INTAKE;
                     }
-                    if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3) {
-                        ClawTime.reset();
-                        OuttakeClaw.setPosition(0);
-                        OuttakeClawClosed = true;
-                    } else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
-                        ClawTime.reset();
-                        OuttakeClaw.setPosition(.45);
-                        OuttakeClawClosed = false;
-                    }
                     if (gamepad2.right_trigger >= .75 && TargetLift < MAX_TARGET_LIFT - 10) {
                         TargetLift = TargetLift + 10;
                     } else if (gamepad2.left_trigger >= .75 && TargetLift > 10) {
@@ -349,6 +339,36 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
                     }
                     break;
             }
+// *********** current sensing added *********
+
+            if (gamepad1.x && gamepad1.y) {    // enter sensing mode
+                OuttakeV4B.setPosition(.5);
+                IntakeV4B.setPosition(.8);
+                OuttakeWrist.setPosition(.25);
+                HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);
+                VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);
+                ExtendPower = -.25;
+                IntakeLeft.setPower(ExtendPower);
+                IntakeRight.setPower(ExtendPower);
+                while (IntakeLeft.getCurrent(CurrentUnit.AMPS) < HorizontalCurrentThreshold) {
+                }
+                IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                LiftPower = -.25;
+                LeftLift.setPower(LiftPower);
+                RightLift.setPower(LiftPower);
+                while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) {
+                }
+                LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+// ******** current sensing added **********
+
             if (gamepad1.dpad_up && gamepad2.dpad_up) {
                 TargetLift = MAX_TARGET_LIFT - 10;
                 PegLegTime.reset();
@@ -373,6 +393,16 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
                     V4Bpos = .5;
                 }
                 Flex = .63;
+            }
+
+            if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3) {
+                ClawTime.reset();
+                OuttakeClaw.setPosition(0);
+                OuttakeClawClosed = true;
+            } else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
+                ClawTime.reset();
+                OuttakeClaw.setPosition(.45);
+                OuttakeClawClosed = false;
             }
 
 

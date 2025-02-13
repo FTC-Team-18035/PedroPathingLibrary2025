@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Sample Preload Delivery", preselectTeleOp = "TeleOpCurrentSensing", group = "Main")
+@Autonomous(name = "Sample Preload Delivery", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
 public class SamplePreloadDelivery extends OpMode {
 
     private Follower follower;
@@ -82,6 +82,7 @@ public class SamplePreloadDelivery extends OpMode {
             case 0:
                 follower.followPath(scorePath);
                 actionTimer.resetTimer();
+                opModeTimer.resetTimer();
                 setPathValue(1);
                 break;
 
@@ -158,7 +159,6 @@ public class SamplePreloadDelivery extends OpMode {
         pathTimer = new Timer();
         opModeTimer = new Timer();
         actionTimer = new Timer();
-        opModeTimer.resetTimer();
 
         // LIFT INIT
 
@@ -203,6 +203,8 @@ public class SamplePreloadDelivery extends OpMode {
         follower.setStartingPose(startPose);
         buildPaths();
     }
+
+
 
     public void RunLift(int target, int MaxTargetLift) {
         TargetLift = target;

@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Push Samples", preselectTeleOp = "TeleOpWithCurrentSensing", group = "main")
+@Autonomous(name = "Push Samples", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
 public class RightPushSamples extends OpMode {
 
     private Follower follower;
@@ -52,14 +52,14 @@ public class RightPushSamples extends OpMode {
     private final Pose startPose = new Pose(5.8, 54, Math.toRadians(0));
     private final Pose setupPose1 = new Pose(26, 35, Math.toRadians(0));
     private final Pose setupPose2 = new Pose(58, 35, Math.toRadians(0));
-    private final Pose lineupPose1_1 = new Pose(58, 20, Math.toRadians(0));
-    private final Pose pushSamplePose1 = new Pose(12, 20, Math.toRadians(0));
-    private final Pose lineupPose2_1 = new Pose(58, 20, Math.toRadians(0));
-    private final Pose lineupPose2_2 = new Pose(58, 9, Math.toRadians(0));
-    private final Pose pushSamplePose2 = new Pose(12, 9, Math.toRadians(0));
-    private final Pose lineupPose3_1 = new Pose(58, 9, Math.toRadians(0));
-    private final Pose lineupPose3_2 = new Pose(58, 6, Math.toRadians(0));
-    private final Pose pushSamplePose3 = new Pose(12, 6, Math.toRadians(0));
+    private final Pose lineupPose1_1 = new Pose(58, 23, Math.toRadians(0));
+    private final Pose pushSamplePose1 = new Pose(12, 23, Math.toRadians(0));
+    private final Pose lineupPose2_1 = new Pose(58, 23, Math.toRadians(0));
+    private final Pose lineupPose2_2 = new Pose(58, 13, Math.toRadians(0));
+    private final Pose pushSamplePose2 = new Pose(12, 13, Math.toRadians(0));
+    private final Pose lineupPose3_1 = new Pose(58, 13, Math.toRadians(0));
+    private final Pose lineupPose3_2 = new Pose(58, 9, Math.toRadians(0));
+    private final Pose pushSamplePose3 = new Pose(12, 9, Math.toRadians(0));
 
     private Path setupPath1, setupPath2, lineupPath1, pushSample1Path, lineupPath2_1, lineupPath2_2, pushSample2Path, lineupPath3_1, lineupPath3_2, pushSample3Path;
 
