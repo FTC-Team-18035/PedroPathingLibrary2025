@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-
+@Disabled
 @Autonomous(name = "Pedro Distance Test")
 public class PedroPath_DifferentFeet extends OpMode {
 
