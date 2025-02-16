@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(group = "Main")
+@TeleOp(name = "Main TeleOp", group = "Main")
 public class TeleOpWithCurrentSensing extends LinearOpMode {
 
     private PIDController LiftController;
@@ -278,15 +278,6 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
                         TargetLift = 2520;
                         state = State.OUTTAKE;
                     }
-                    if (gamepad2.left_bumper && !OuttakeClawClosed && ClawTime.seconds() >= .3) {
-                        ClawTime.reset();
-                        OuttakeClaw.setPosition(0);
-                        OuttakeClawClosed = true;
-                    } else if (gamepad2.left_bumper && OuttakeClawClosed && ClawTime.seconds() >= .3) {
-                        ClawTime.reset();
-                        OuttakeClaw.setPosition(.45);
-                        OuttakeClawClosed = false;
-                    }
                     if (gamepad2.right_bumper && !IntakeClawClosed && ClawTime.seconds() >= .3) {
                         ClawTime.reset();
                         IntakeClaw.setPosition(.5);
@@ -369,7 +360,7 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
             }
 // ******** current sensing added **********
 
-            if (gamepad1.dpad_up && gamepad2.dpad_up) {
+            if (gamepad2.dpad_up) {
                 TargetLift = MAX_TARGET_LIFT - 10;
                 PegLegTime.reset();
                 state = State.CLIMB;
