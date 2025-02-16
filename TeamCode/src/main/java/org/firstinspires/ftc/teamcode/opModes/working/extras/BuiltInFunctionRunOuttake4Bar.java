@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.opModes.working.extras;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
-
+@Disabled
 @TeleOp(name = "Run Outtake V4Bar Test Built In Function")
 public class BuiltInFunctionRunOuttake4Bar extends LinearOpMode {
 
