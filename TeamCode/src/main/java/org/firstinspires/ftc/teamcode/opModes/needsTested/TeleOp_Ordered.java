@@ -207,7 +207,7 @@ public class TeleOp_Ordered extends LinearOpMode {
      RightLift.setPower(LiftPower);
      while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) { }     // wait for complete Lift retraction
      LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);              // reset position
-     LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+     RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
      // ****************************** set Extension and Lift to run with PID control ***************************************
      IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -379,7 +379,7 @@ public class TeleOp_Ordered extends LinearOpMode {
                     RightLift.setPower(LiftPower);
                     while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) { }
                     LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
