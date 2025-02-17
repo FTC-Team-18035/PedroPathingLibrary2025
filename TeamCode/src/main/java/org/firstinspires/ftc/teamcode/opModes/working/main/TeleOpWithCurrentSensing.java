@@ -191,7 +191,7 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
         while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) {
         }
         LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         LeftLift.setPower(LiftPower);
         RightLift.setPower(LiftPower);
