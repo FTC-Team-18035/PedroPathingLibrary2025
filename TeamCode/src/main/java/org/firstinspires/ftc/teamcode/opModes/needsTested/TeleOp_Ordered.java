@@ -55,18 +55,18 @@ public class TeleOp_Ordered extends LinearOpMode {
  private int precision = 2;                      // chassis motor power reduction factor 1 Turbo/ 2 Normal/ 4 Precision
 
  // *********** declare Lift and Extension motor control variables  *********
- private double LiftPower;		// declare lift power variable
- private double ExtendPower;	// declare extension power variable
+ public double LiftPower;		// declare lift power variable
+ public double ExtendPower;	// declare extension power variable
 
  // ******** constraint variables for Lift and Extension safety ****************
  private final int MAX_TARGET_LIFT = 2655;               // The max Lift Height
  private final int MAX_EXTENSION_LENGTH = 415;   // The max Extension Length
 
  // ********** self calibration sequence variables for Lift and Extension **************
- private static double HorizontalCurrentThreshold = 2;		// Variables to enable self reset of Extension and Lift
- private static double VerticalCurrentThreshold = 1;		// CurrentSensingTest has this value
- private double HorizontalCurrent;
- private double VerticalCurrent;
+ public static double HorizontalCurrentThreshold = 2;		// Variables to enable self reset of Extension and Lift
+ public static double VerticalCurrentThreshold = 1;		// CurrentSensingTest has this value
+ public double HorizontalCurrent;
+ public double VerticalCurrent;
 
  // ************* switching place holders for state logic and control **************
  private boolean IntakeClawClosed = false;                   // claw holder variable
@@ -194,20 +194,7 @@ public class TeleOp_Ordered extends LinearOpMode {
      PegLeg.setPosition(0);
 
      // *********************** Extension and Lift reset sequence ***********************************
-     HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);       	 // read Extension motor amperage for comparison
-     VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);                // read Lift  motor amperage for comparison
-     ExtendPower = -.25;                                                     // begin low power Extension reset sequence
-     IntakeLeft.setPower(ExtendPower);
-     IntakeRight.setPower(ExtendPower);
-     while (IntakeLeft.getCurrent(CurrentUnit.AMPS) < HorizontalCurrentThreshold) { }  // wait for complete Extension retraction
-     IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                       // reset position
-     IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-     LiftPower = -.25;                                                                                                  // begin low power Lift reset sequence
-     LeftLift.setPower(LiftPower);
-     RightLift.setPower(LiftPower);
-     while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) { }     // wait for complete Lift retraction
-     LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);              // reset position
-     RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+     ResetSequence();
 
      // ****************************** set Extension and Lift to run with PID control ***************************************
      IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -363,27 +350,7 @@ public class TeleOp_Ordered extends LinearOpMode {
 
                 // ************************** current sensing reset selection during opmode if realignment is needed **************
                 if (gamepad1.square && gamepad1.triangle) {    // enter sensing mode
-                    OuttakeV4B.setPosition(.5);
-                    IntakeV4B.setPosition(.8);
-                    OuttakeWrist.setPosition(.25);
-                    HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);
-                    VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);
-                    ExtendPower = -.25;
-                    IntakeLeft.setPower(ExtendPower);
-                    IntakeRight.setPower(ExtendPower);
-                    while (IntakeLeft.getCurrent(CurrentUnit.AMPS) < HorizontalCurrentThreshold) { }
-                    IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    LiftPower = -.25;
-                    LeftLift.setPower(LiftPower);
-                    RightLift.setPower(LiftPower);
-                    while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) { }
-                    LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    IntakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    IntakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    LeftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                   ResetSequence();
                 }
 
                 // ***************************Manual control of Outtake Claw **********************************
@@ -490,4 +457,20 @@ public class TeleOp_Ordered extends LinearOpMode {
     }
 }
 
-
+public void ResetSequence() {
+     // *********************** Extension and Lift reset sequence ***********************************
+     HorizontalCurrent = IntakeLeft.getCurrent(CurrentUnit.AMPS);       	 // read Extension motor amperage for comparison
+     VerticalCurrent = LeftLift.getCurrent(CurrentUnit.AMPS);                // read Lift  motor amperage for comparison
+     ExtendPower = -.25;                                                     // begin low power Extension reset sequence
+     IntakeLeft.setPower(ExtendPower);
+     IntakeRight.setPower(ExtendPower);
+     while (IntakeLeft.getCurrent(CurrentUnit.AMPS) < HorizontalCurrentThreshold) { }  // wait for complete Extension retraction
+     IntakeLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                       // reset position
+     IntakeRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+     LiftPower = -.25;                                                                // begin low power Lift reset sequence
+     LeftLift.setPower(LiftPower);
+     RightLift.setPower(LiftPower);
+     while (RightLift.getCurrent(CurrentUnit.AMPS) < VerticalCurrentThreshold) { }     // wait for complete Lift retraction
+     LeftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);              // reset position
+     RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+}
