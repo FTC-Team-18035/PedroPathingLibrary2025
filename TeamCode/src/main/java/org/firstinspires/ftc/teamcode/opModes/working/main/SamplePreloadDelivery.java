@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Sample Preload Delivery", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
+@Autonomous(name = "Left Auto", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
 public class SamplePreloadDelivery extends OpMode {
 
     private Follower follower;

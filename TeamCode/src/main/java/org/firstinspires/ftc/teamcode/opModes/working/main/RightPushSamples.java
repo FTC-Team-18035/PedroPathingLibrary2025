@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Push Samples", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
+@Autonomous(name = "Right Auto", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
 public class RightPushSamples extends OpMode {
 
     private Follower follower;
@@ -106,57 +106,57 @@ public class RightPushSamples extends OpMode {
                 break;
 
             case 1:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(setupPath2);
                     actionTimer.resetTimer();
                     setPathValue(2);
                 }
                 break;
             case 2:
-                if(actionTimer.getElapsedTimeSeconds() > 3) {
+                if(actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(lineupPath1);
                     actionTimer.resetTimer();
                     setPathValue(3);
                 }
                 break;
             case 3:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(pushSample1Path);
                     actionTimer.resetTimer();
                     setPathValue(4);
                 }
             case 4:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(lineupPath2_1);
                     actionTimer.resetTimer();
                     setPathValue(5);
                 }
             case 5:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(lineupPath2_2);
                     actionTimer.resetTimer();
                     setPathValue(6);
                 }
             case 6:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(pushSample2Path);
                     actionTimer.resetTimer();
                     setPathValue(7);
                 }
             case 7:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(lineupPath3_1);
                     actionTimer.resetTimer();
                     setPathValue(8);
                 }
             case 8:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(lineupPath3_2);
                     actionTimer.resetTimer();
                     setPathValue(9);
                 }
             case 9:
-                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(pushSample3Path);
                     actionTimer.resetTimer();
                     setPathValue(-1);
@@ -174,7 +174,7 @@ public class RightPushSamples extends OpMode {
         follower.update();
         autonomousPathUpdate();
         RunLift(TargetLift, MAX_TARGET_LIFT);
-        if(opModeTimer.getElapsedTimeSeconds() > 28) {
+        if(opModeTimer.getElapsedTimeSeconds() > 25) {
             OuttakeV4B.setPosition(.5);
             IntakeV4B.setPosition(.8);
             OuttakeWrist.setPosition(.25);

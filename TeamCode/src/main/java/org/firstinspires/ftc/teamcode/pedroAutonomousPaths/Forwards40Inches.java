@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-
+@Disabled
 @Autonomous(name = "40 inches forwards")
 public class Forwards40Inches extends OpMode {
 

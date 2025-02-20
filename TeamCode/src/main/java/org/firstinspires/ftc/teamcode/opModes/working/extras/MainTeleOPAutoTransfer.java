@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Disabled
-@TeleOp(name = "Main TeleOp")
+@TeleOp(name = "Main TeleOp OLD")
 public class MainTeleOPAutoTransfer extends LinearOpMode {
 
     private double frontLeftPower = 0;     // declare motor power variable
