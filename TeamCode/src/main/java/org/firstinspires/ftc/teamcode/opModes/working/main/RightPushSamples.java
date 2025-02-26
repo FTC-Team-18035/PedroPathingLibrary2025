@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Right Auto", preselectTeleOp = "TeleOpWithCurrentSensing", group = "Main")
+@Autonomous(name = "Right Auto", preselectTeleOp = "Main TeleOp", group = "Main")
 public class RightPushSamples extends OpMode {
 
     private Follower follower;
