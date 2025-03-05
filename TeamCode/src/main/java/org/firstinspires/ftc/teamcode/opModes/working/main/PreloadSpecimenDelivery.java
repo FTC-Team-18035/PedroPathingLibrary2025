@@ -119,12 +119,14 @@ public class PreloadSpecimenDelivery extends OpMode {
                     actionTimer.resetTimer();
                     setPathValue(3);
                 }
+                break;
             case 3:
                 if(actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(park);
                     actionTimer.resetTimer();
                     setPathValue(-1);
                 }
+                break;
         }
     }
 
