@@ -264,7 +264,7 @@ public class TeleOpWithCurrentSensing extends LinearOpMode {
                             IntakeClaw.setPosition(0);
                         }
                     }
-                    if (IntakeClaw.getPosition() == 0) {
+                    if (IntakeClaw.getPosition() == 0 && Transfer_Delay.seconds() >= 1) {
                         V4Bpos = .75;
                         if (Transfer_Delay.seconds() >= .75) {
                             state = State.IDLE;

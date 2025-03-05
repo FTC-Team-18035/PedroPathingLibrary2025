@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.needsTested;
+package org.firstinspires.ftc.teamcode.opModes.working.main;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "4 Sample Basket", group = "Main")
+@Autonomous(name = "2 Sample Basket", group = "Main")
 public class FourSampleBasketDelivery extends OpMode {
 
     private Follower follower;
@@ -52,8 +52,15 @@ public class FourSampleBasketDelivery extends OpMode {
     private static final int MAX_TARGET_LIFT = 2825;
     private final int MAX_EXTENSION_LENGTH = 415;
 
+    private double V4Bpos = .8;
+    private double Flex = 0;
+    private double Yaw = 0;
+
     private double LiftPower;
     private double ExtendPower;
+
+    public double LeftServo;
+    public double RightServo;
 
     Servo IntakeV4B;     // Chub Port 3 // Preset To Swing Out With X
     // Servo LeftIntakeV4B = hardwareMap.servo.get("Left Intake V4B");       // Chub Port 4 // --------------------------
@@ -65,17 +72,18 @@ public class FourSampleBasketDelivery extends OpMode {
     Servo RightIntakeWrist;
     Servo LeftIntakeWrist;
 
-    private final Pose startPose = new Pose(8.6, 88, Math.toRadians(0));
+    private final Pose startPose = new Pose(11.5, 119, Math.toRadians(-45));
     private final Pose lineupPos = new Pose(19, 128, Math.toRadians(-45));
     private final Pose scorePose = new Pose(16, 130, Math.toRadians(-45));
-    private final Pose sample1Pos = new Pose(32, 122, Math.toRadians(0));
+    private final Pose sample1Pos = new Pose(19, 128, Math.toRadians(-3.5));
     private final Pose sample2Pose = new Pose(32, 132, Math.toRadians(0));
     private final Pose sample3Pose = new Pose(32, 130, Math.toRadians(30));
-    private final Pose parkPose = new Pose(61, 95, Math.toRadians(90));
-    private final Pose parkControlPose = new Pose(61, 120, Math.toRadians(90));
+    private final Pose parkPose1 = new Pose(60, 97, Math.toRadians(90));
+    private final Pose parkControlPose = new Pose(29, 97, Math.toRadians(90));
+    private final Pose parkControlPose2 = new Pose(58, 140, Math.toRadians(90));
 
 
-    private Path score, lineupPreload, pickupSample1, lineupSample1, pickupSample2, lineupSample2, pickupSample3, lineupSample3, park;
+    private Path scoreSample1, pullForwardsPath, score, lineupPreload, pickupSample1, lineupSample1, pickupSample2, lineupSample2, pickupSample3, lineupSample3, park;
 
     public void buildPaths() {
         lineupPreload = new Path(new BezierLine(new Point(startPose), new Point(lineupPos)));
@@ -102,20 +110,26 @@ public class FourSampleBasketDelivery extends OpMode {
         lineupSample3 = new Path(new BezierLine(new Point(sample3Pose), new Point(lineupPos)));
         lineupSample3.setLinearHeadingInterpolation(sample3Pose.getHeading(), lineupPos.getHeading());
 
-        park = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkPose)));
-        park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
+        park = new Path(new BezierCurve(new Point(sample1Pos), new Point(parkControlPose), new Point(parkControlPose2), new Point(parkPose1)));
+        park.setLinearHeadingInterpolation(sample1Pos.getHeading(), parkPose1.getHeading());
+
+        pullForwardsPath = new Path(new BezierLine(new Point(scorePose), new Point(sample1Pos)));
+        pullForwardsPath.setLinearHeadingInterpolation(scorePose.getHeading(), sample1Pos.getHeading());
+
+        scoreSample1 = new Path(new BezierLine(new Point(sample1Pos), new Point(scorePose)));
+        scoreSample1.setLinearHeadingInterpolation(sample1Pos.getHeading(), scorePose.getHeading());
     }
 
     public void autonomousPathUpdate() {
-        switch(pathState) {
+        switch(pathState) {     // Lineup in front of basket
             case 0:
                 follower.followPath(lineupPreload);
                 actionTimer.resetTimer();
                 opModeTimer.resetTimer();
                 setPathValue(1);
                 break;
-            case 1:
-                if (actionTimer.getElapsedTimeSeconds() > 4) {
+            case 1:         // Raise the lift to deliver preload
+                if (actionTimer.getElapsedTimeSeconds() > 2) {
                     TargetLift = 2520;
 
                     OuttakeV4B.setPosition(0);
@@ -124,27 +138,117 @@ public class FourSampleBasketDelivery extends OpMode {
                 }
                 break;
 
-            case 2:
+            case 2:     // Back up to position outtake over the basket
                     if (actionTimer.getElapsedTimeSeconds() > 3) {
                         follower.followPath(score);
                         setPathValue(3);
                     }
                 break;
-            case 3:
+            case 3:     // Opens the outtake claw
                 if(actionTimer.getElapsedTimeSeconds() > 4.5) {
                     OuttakeClaw.setPosition(.45);
                     actionTimer.resetTimer();
                     setPathValue(4);
                 }
                 break;
-            case 4:
+            /*case 4:
                 if(actionTimer.getElapsedTimeSeconds() > 2) {
                     follower.followPath(pickupSample1);
                     actionTimer.resetTimer();
                     setPathValue(5);
                 }
+                break;*/
+            case 4:
+                if(actionTimer.getElapsedTimeSeconds() > 2) {
+                    follower.followPath(pullForwardsPath);
+                    actionTimer.resetTimer();
+                    setPathValue(5);
+                }
                 break;
             case 5:
+                if(actionTimer.getElapsedTimeSeconds() > 2) {
+                    OuttakeV4B.setPosition(1);
+                    OuttakeWrist.setPosition(.03);
+                    TargetExtend = 415;
+                    V4Bpos = .3;
+                    Flex = .63;
+                    actionTimer.resetTimer();
+                    setPathValue(6);
+                }
+                break;
+            case 6:
+                if(actionTimer.getElapsedTimeSeconds() > .5) {
+                    IntakeClaw.setPosition(.45);
+                    actionTimer.resetTimer();
+                    setPathValue(7);
+                }
+                break;
+            case 7:
+                if(actionTimer.getElapsedTimeSeconds() > 1) {
+                    V4Bpos = 1;
+                    Flex = 0;
+                    TargetExtend = 1;
+                }
+                if(actionTimer.getElapsedTimeSeconds() > 2) {
+                    TargetLift = 480;
+                }
+                if(actionTimer.getElapsedTimeSeconds() > 3.5) {
+                    OuttakeClaw.setPosition(0);
+                }
+                if(actionTimer.getElapsedTimeSeconds() > 4.5) { // 4
+                    IntakeClaw.setPosition(0);
+                    actionTimer.resetTimer();
+                    setPathValue(8);
+                }
+                break;
+
+            case 8:
+                if (actionTimer.getElapsedTimeSeconds() > 1) {
+                    TargetLift = 2520;
+
+                    OuttakeV4B.setPosition(0);
+                    OuttakeWrist.setPosition(.7);
+                    actionTimer.resetTimer();
+                    setPathValue(9);
+                }
+                break;
+
+            case 9:
+                if (actionTimer.getElapsedTimeSeconds() > 1.5) {
+                    follower.followPath(scoreSample1);
+                    actionTimer.resetTimer();
+                    setPathValue(10);
+                }
+                break;
+            case 10:
+                if(actionTimer.getElapsedTimeSeconds() > 1.5) {
+                    OuttakeClaw.setPosition(.45);
+                    actionTimer.resetTimer();
+                    setPathValue(11);
+                }
+                break;
+
+            case 11:
+                if(actionTimer.getElapsedTimeSeconds() > 1) {
+                    follower.followPath(pullForwardsPath);
+                    actionTimer.resetTimer();
+                    setPathValue(12);
+                }
+                break;
+            case 12:
+                if(actionTimer.getElapsedTimeSeconds() > 1) {
+                    TargetLift = 400;
+                    OuttakeV4B.setPosition(.25);
+                    OuttakeWrist.setPosition(.7);
+                    setPathValue(13);
+                }
+                break;
+            case 13:
+                follower.followPath(park);
+                setPathValue(-1);
+                break;
+
+        /*    case 5:
                 if(actionTimer.getElapsedTimeSeconds() > 3) {
                     TargetLift = 800;
                     OuttakeV4B.setPosition(1);
@@ -167,7 +271,7 @@ public class FourSampleBasketDelivery extends OpMode {
                     if(actionTimer.getElapsedTimeSeconds() > 12.5) {
                         IntakeClaw.setPosition(0);
                         actionTimer.resetTimer();
-                        setPathValue(6);
+                        setPathValue(-1);
                     }
                 }
                 break;
@@ -337,7 +441,7 @@ public class FourSampleBasketDelivery extends OpMode {
                 if(actionTimer.getElapsedTimeSeconds() < 5) {
                     follower.followPath(park);
                 }
-                else{ requestOpModeStop(); }
+                else{ requestOpModeStop(); } */
         }
     }
 
@@ -352,7 +456,14 @@ public class FourSampleBasketDelivery extends OpMode {
         autonomousPathUpdate();
         RunLift(TargetLift, MAX_TARGET_LIFT);
         RunIntake(TargetExtend, MAX_EXTENSION_LENGTH);
+        Use4BarParts(Flex, Yaw, V4Bpos);
 
+        if(opModeTimer.getElapsedTimeSeconds() >= 23) {
+            TargetLift = 270;
+            if(opModeTimer.getElapsedTimeSeconds() >= 24) {
+                requestOpModeStop();
+            }
+        }
 
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
@@ -451,5 +562,15 @@ public class FourSampleBasketDelivery extends OpMode {
         double ExtendPower = Epid + ExtendFF;
         IntakeLeft.setPower(ExtendPower);
         IntakeRight.setPower(ExtendPower);
+    }
+
+    public void Use4BarParts(double Flex, double Yaw, double V4Bpos) {
+
+        IntakeV4B.setPosition(V4Bpos);
+
+        LeftServo = Math.max(0, Math.min(1, Flex - (.5 * Yaw)));
+        RightServo = Math.max(0, Math.min(1, Flex + (.5 * Yaw)));
+        LeftIntakeWrist.setPosition(LeftServo); //Sets servos to calculated positions
+        RightIntakeWrist.setPosition(RightServo);
     }
 }

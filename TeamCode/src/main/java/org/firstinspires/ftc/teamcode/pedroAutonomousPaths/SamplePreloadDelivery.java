@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.opModes.working.main;
+package org.firstinspires.ftc.teamcode.pedroAutonomousPaths;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.Point;
@@ -21,8 +22,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-@Autonomous(name = "Right Auto", preselectTeleOp = "Main TeleOp", group = "Main")
-public class RightPushSamples extends OpMode {
+@Disabled
+@Autonomous(name = "Left Auto", preselectTeleOp = "Main TeleOp", group = "Main")
+public class SamplePreloadDelivery extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opModeTimer;
@@ -49,118 +51,84 @@ public class RightPushSamples extends OpMode {
     Servo OuttakeClaw;
     Servo OuttakeWrist;
 
-    private final Pose startPose = new Pose(5.8, 54, Math.toRadians(0));
-    private final Pose setupPose1 = new Pose(26, 35, Math.toRadians(0));
-    private final Pose setupPose2 = new Pose(58, 35, Math.toRadians(0));
-    private final Pose lineupPose1_1 = new Pose(58, 23, Math.toRadians(0));
-    private final Pose pushSamplePose1 = new Pose(12, 23, Math.toRadians(0));
-    private final Pose lineupPose2_1 = new Pose(58, 23, Math.toRadians(0));
-    private final Pose lineupPose2_2 = new Pose(58, 13, Math.toRadians(0));
-    private final Pose pushSamplePose2 = new Pose(12, 13, Math.toRadians(0));
-    private final Pose lineupPose3_1 = new Pose(58, 13, Math.toRadians(0));
-    private final Pose lineupPose3_2 = new Pose(58, 9, Math.toRadians(0));
-    private final Pose pushSamplePose3 = new Pose(12, 9, Math.toRadians(0));
+    private final Pose startPose = new Pose(11.5, 119, Math.toRadians(-45));
 
-    private Path setupPath1, setupPath2, lineupPath1, pushSample1Path, lineupPath2_1, lineupPath2_2, pushSample2Path, lineupPath3_1, lineupPath3_2, pushSample3Path;
+    private final Pose scorePose = new Pose(19, 128, Math.toRadians(-45));
+    private final Pose endPose = new Pose(16, 130, Math.toRadians(-45)); // 11 to the left
+    private final Pose pullForwardsPose = new Pose(23, 11, Math.toRadians(-45));
+    private final Pose parkPose1 = new Pose(60, 97, Math.toRadians(90));
+    private final Pose parkControlPose = new Pose(29, 97, Math.toRadians(90));
+    private final Pose parkControlPose2 = new Pose(58, 140, Math.toRadians(90));
+    private Path scorePath, endPath, pullForwardsPath, parkPath1, parkPath2;
 
     public void buildPaths() {
        // driveFarRight = new Path(new BezierLine(new Point(startPose), new Point(farRightPose)));
        // driveFarRight.setLinearHeadingInterpolation(startPose.getHeading(), farRightPose.getHeading());
-        setupPath1 = new Path(new BezierLine(new Point(startPose), new Point(setupPose1)));
-        setupPath1.setLinearHeadingInterpolation(startPose.getHeading(), setupPose1.getHeading());
+        endPath = new Path(new BezierLine(new Point(scorePose), new Point(endPose)));
+        endPath.setLinearHeadingInterpolation(scorePose.getHeading(), endPose.getHeading());
 
-        setupPath2 = new Path(new BezierLine(new Point(setupPose1), new Point(setupPose2)));
-        setupPath2.setLinearHeadingInterpolation(setupPose1.getHeading(), setupPose2.getHeading());
+        scorePath = new Path(new BezierLine(new Point(startPose), new Point(scorePose)));
+        scorePath.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
 
-        lineupPath1 = new Path(new BezierLine(new Point(setupPose2), new Point(lineupPose1_1)));
-        lineupPath1.setLinearHeadingInterpolation(setupPose2.getHeading(), lineupPose1_1.getHeading());
+        pullForwardsPath = new Path(new BezierLine(new Point(endPose), new Point(scorePose)));
+        pullForwardsPath.setLinearHeadingInterpolation(endPose.getHeading(), scorePose.getHeading());
 
-        pushSample1Path = new Path(new BezierLine(new Point(lineupPose1_1), new Point(pushSamplePose1)));
-        pushSample1Path.setLinearHeadingInterpolation(lineupPose1_1.getHeading(), pushSamplePose1.getHeading());
+        parkPath1 = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkControlPose2), new Point(parkPose1)));
+        parkPath1.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose1.getHeading());
 
-        lineupPath2_1 = new Path(new BezierLine(new Point(pushSamplePose1), new Point(lineupPose2_1)));
-        lineupPath2_1.setLinearHeadingInterpolation(pushSamplePose1.getHeading(), lineupPose2_1.getHeading());
-
-        lineupPath2_2 = new Path(new BezierLine(new Point(lineupPose2_1), new Point(lineupPose2_2)));
-        lineupPath2_2.setLinearHeadingInterpolation(lineupPose2_1.getHeading(), lineupPose2_2.getHeading());
-
-        pushSample2Path = new Path(new BezierLine(new Point(lineupPose2_2), new Point(pushSamplePose2)));
-        pushSample2Path.setLinearHeadingInterpolation(lineupPose2_2.getHeading(), pushSamplePose2.getHeading());
-
-        lineupPath3_1 = new Path(new BezierLine(new Point(pushSamplePose2), new Point(lineupPose3_1)));
-        lineupPath3_1.setLinearHeadingInterpolation(pushSamplePose2.getHeading(), lineupPose3_1.getHeading());
-
-        lineupPath3_2 = new Path(new BezierLine(new Point(lineupPose3_1), new Point(lineupPose3_2)));
-        lineupPath3_2.setLinearHeadingInterpolation(lineupPose3_1.getHeading(), lineupPose3_2.getHeading());
-
-        pushSample3Path = new Path(new BezierLine(new Point(lineupPose3_2), new Point(pushSamplePose3)));
-        pushSample3Path.setLinearHeadingInterpolation(lineupPose3_2.getHeading(), pushSamplePose3.getHeading());
     }
 
     public void autonomousPathUpdate() {
         switch(pathState) {
             case 0:
-                follower.followPath(setupPath1);
+                follower.followPath(scorePath);
                 actionTimer.resetTimer();
+                opModeTimer.resetTimer();
                 setPathValue(1);
                 break;
 
             case 1:
                 if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(setupPath2);
-                    actionTimer.resetTimer();
+                    TargetLift = 2520;
+
+                    OuttakeV4B.setPosition(0);
+                    OuttakeWrist.setPosition(.7);
                     setPathValue(2);
                 }
                 break;
+
             case 2:
-                if(actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(lineupPath1);
-                    actionTimer.resetTimer();
-                    setPathValue(3);
-                }
+                    if (actionTimer.getElapsedTimeSeconds() > 3) {
+                        follower.followPath(endPath);
+                        setPathValue(3);
+                    }
                 break;
             case 3:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(pushSample1Path);
+                if(actionTimer.getElapsedTimeSeconds() > 4.5) {
+                    OuttakeClaw.setPosition(.45);
                     actionTimer.resetTimer();
                     setPathValue(4);
                 }
+                break;
             case 4:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(lineupPath2_1);
+                if(actionTimer.getElapsedTimeSeconds() > 2) {
+                    follower.followPath(pullForwardsPath);
                     actionTimer.resetTimer();
                     setPathValue(5);
                 }
+                break;
             case 5:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(lineupPath2_2);
-                    actionTimer.resetTimer();
+                if(actionTimer.getElapsedTimeSeconds() > 3) {
+                    TargetLift = 400;
+                    OuttakeV4B.setPosition(.25);
+                    OuttakeWrist.setPosition(.7);
                     setPathValue(6);
                 }
+                break;
             case 6:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(pushSample2Path);
-                    actionTimer.resetTimer();
-                    setPathValue(7);
-                }
-            case 7:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(lineupPath3_1);
-                    actionTimer.resetTimer();
-                    setPathValue(8);
-                }
-            case 8:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(lineupPath3_2);
-                    actionTimer.resetTimer();
-                    setPathValue(9);
-                }
-            case 9:
-                if (actionTimer.getElapsedTimeSeconds() > 2) {
-                    follower.followPath(pushSample3Path);
-                    actionTimer.resetTimer();
+                    follower.followPath(parkPath1);
                     setPathValue(-1);
-                }
+                    break;
         }
     }
 
@@ -174,12 +142,10 @@ public class RightPushSamples extends OpMode {
         follower.update();
         autonomousPathUpdate();
         RunLift(TargetLift, MAX_TARGET_LIFT);
-        if(opModeTimer.getElapsedTimeSeconds() > 25) {
-            OuttakeV4B.setPosition(.5);
-            IntakeV4B.setPosition(.8);
-            OuttakeWrist.setPosition(.25);
-        }
 
+        if(opModeTimer.getElapsedTimeSeconds() > 15) {
+            requestOpModeStop();
+        }
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
@@ -194,7 +160,6 @@ public class RightPushSamples extends OpMode {
         pathTimer = new Timer();
         opModeTimer = new Timer();
         actionTimer = new Timer();
-        opModeTimer.resetTimer();
 
         // LIFT INIT
 
@@ -239,6 +204,8 @@ public class RightPushSamples extends OpMode {
         follower.setStartingPose(startPose);
         buildPaths();
     }
+
+
 
     public void RunLift(int target, int MaxTargetLift) {
         TargetLift = target;
